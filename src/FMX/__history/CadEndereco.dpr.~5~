@@ -1,0 +1,19 @@
+program CadEndereco;
+
+uses
+  System.StartUpCopy,
+  FMX.Forms,
+  View.Principal in 'Views\View.Principal.pas' {frmPrincipal},
+  superdate in '..\VCL\Classes\superdate.pas',
+  superobject in '..\VCL\Classes\superobject.pas',
+  supertimezone in '..\VCL\Classes\supertimezone.pas',
+  supertypes in '..\VCL\Classes\supertypes.pas',
+  superxmlparser in '..\VCL\Classes\superxmlparser.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.Run;
+end.

@@ -1,0 +1,57 @@
+unit DAO.Tipopgto;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections, Model.Tipopgto;
+
+type TDAOTipopgto = class
+  private
+    FConexao: TConexao;
+  public
+    constructor Create;
+
+  function ListAll()  : TJSONArray;
+  function ListById(AId: Integer): TJSONArray;
+  procedure Insert(ATipopgtoModel: TModelTipopgto);
+  procedure Update(ATipopgtoModel: TModelTipopgto);
+  procedure Delete(AId: Integer);
+
+end;
+
+implementation
+
+{ TDAOTipopgto }
+
+constructor TDAOTipopgto.Create;
+begin
+
+end;
+
+function TDAOTipopgto.ListAll: TJSONArray;
+begin
+
+end;
+
+function TDAOTipopgto.ListById(AId: Integer): TJSONArray;
+begin
+
+end;
+
+procedure TDAOTipopgto.Insert(ATipopgtoModel: TModelTipopgto);
+begin
+
+end;
+
+procedure TDAOTipopgto.Update(ATipopgtoModel: TModelTipopgto);
+begin
+
+end;
+
+procedure TDAOTipopgto.Delete(AId: Integer);
+begin
+
+end;
+
+end.

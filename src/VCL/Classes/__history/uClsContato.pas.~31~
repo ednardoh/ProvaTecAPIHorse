@@ -1,0 +1,263 @@
+//Classe de clientes - Ednardo 01/06/2021
+unit uClsContato;
+
+interface
+
+Uses Winapi.Messages, Vcl.Dialogs, System.SysUtils, UConecta, FireDAC.Stan.Intf,
+     Data.DB, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.DBCtrls, FireDAC.Comp.Client, uPrincipal,
+     Graphics, Variants, Jpeg, Windows, Classes, Controls, Forms, DBClient, uDatamodulo,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+     FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+     FireDAC.Phys.PG, FireDAC.Phys.PGDef, FireDAC.VCLUI.Wait, FireDAC.Stan.Param,
+     FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet,
+     FireDAC.Comp.Client;
+
+type
+  TContatos = class
+    private
+      FId         : Integer;
+      FNome       : string;
+      FData_nasc  : string;
+      FIdade      : string;
+      FTelefone   : string;
+      FId_Cliente : Integer;
+    public
+      //Será usado tanto para os insert como para select
+      QryAuxiliar   : TFDQuery;
+      //Get
+      function GetID          : Integer;
+      function GetNome        : string;
+      function GetData_nasc   : string;
+      function GetIdade       : string;
+      function GetTelefone    : string;
+      function GetId_Cliente  : Integer;
+      //Set
+      procedure SetID(const Value: Integer);
+      procedure SetNome(const Value: string);
+      procedure SetData_nasc(const Value: string);
+      procedure SetIdade(const Value: string);
+      procedure SetTelefone(const Value: string);
+      procedure SetId_Cliente(const Value: Integer);
+      //Consultas
+      procedure PesquisaTabela(strNomeTabela, strCodigo, strNomepesquisa, strValorPesquisa : String); //pesquisa tabela filtrando por um valor
+      procedure AbreTabela(strNomeTabela, strCodigo, strNomepesquisa : String); //pesquisa tabela por completo
+      procedure ConsultaContatosGeral(strNomeTabela, strID : String); //prenche o grid de contatos no cadastro
+      //Crud
+      procedure GravaDados;
+      procedure ALteraDados;
+      procedure ExcluiDados;
+      //Property
+      property Id         : Integer read GetID         write SetID;
+      property Nome       : string  read GetNome       write SetNome;
+      property Data_nasc  : string  read GetData_nasc  write SetData_nasc;
+      property Idade      : string  read GetIdade      write SetIdade;
+      property Telefone   : string  read GetTelefone   write SetTelefone;
+      property Id_Cliente : Integer read GetId_Cliente write SetId_Cliente;
+
+    published
+      constructor Create;
+  end;
+
+implementation
+
+{ TContatos }
+constructor TContatos.Create;
+begin
+  QryAuxiliar := TFDQuery.Create(nil);
+  QryAuxiliar.Connection := frmDatamodulo.DBConect;
+end;
+
+function TContatos.GetData_nasc: string;
+begin
+  Result := FormatDateTime('yyyy-mm-dd',StrToDate(FData_nasc));
+end;
+
+function TContatos.GetID: Integer;
+begin
+  Result := FID;
+end;
+
+function TContatos.GetIdade: string;
+begin
+  Result := FIdade;
+end;
+
+function TContatos.GetId_Cliente: Integer;
+begin
+  Result := FId_Cliente;
+end;
+
+function TContatos.GetNome: string;
+begin
+  Result := FNome;
+end;
+
+function TContatos.GetTelefone: string;
+begin
+  Result := FTelefone;
+end;
+
+procedure TContatos.GravaDados;
+var
+  strSQL: string;
+begin
+  try
+    strSQL :='';
+    frmDatamodulo.DBConect.StartTransaction;
+    QryAuxiliar.Close;
+    QryAuxiliar.SQL.Clear;
+
+    strSQL := ' INSERT INTO CONTATO       ' +
+              '           (Nome,          ' +
+              '            Data_nasc,     ' +
+              '            Idade,         ' +
+              '            Telefone,      ' +
+              '            Id_Cliente)    ' +
+              '     VALUES                ' +
+              '           (:Nome,         ' +
+              '            :Data_nasc,    ' +
+              '            :Idade,        ' +
+              '            :Telefone,     ' +
+              '            :Id_Cliente)   ';
+
+    QryAuxiliar.SQL.Add(strSQL);
+    QryAuxiliar.ParamByName('NOME').AsString        := GetNome;
+    QryAuxiliar.ParamByName('Data_nasc').AsString   := GetData_nasc;
+    QryAuxiliar.ParamByName('Idade').AsString       := GetIdade;
+    QryAuxiliar.ParamByName('Telefone').AsString    := GetTelefone;
+    QryAuxiliar.ParamByName('Id_Cliente').AsInteger := GetId_Cliente;
+
+    QryAuxiliar.ExecSQL();
+    frmDatamodulo.DBConect.Commit;
+  except
+    on E: Exception do
+      begin
+        frmDatamodulo.DBConect.Rollback;  //desfaz a transação
+        ShowMessage('Ocorreu um erro Inesperado. (Contatos): '+E.Message);
+      end;
+  end;
+end;
+
+procedure TContatos.ExcluiDados;
+begin
+  try
+    frmDatamodulo.DBConect.StartTransaction;
+    //Exclui contatos
+    QryAuxiliar.Close;
+    QryAuxiliar.SQL.Clear;
+    QryAuxiliar.SQL.Add('DELETE FROM CONTATO Where Id=:Id');
+    QryAuxiliar.ParamByName('Id').AsInteger := GetID;
+    QryAuxiliar.ExecSQL();
+    frmDatamodulo.DBConect.Commit;
+  except
+    on E: Exception do
+      begin
+        frmDatamodulo.DBConect.Rollback;  //desfaz a transação
+        ShowMessage('Ocorreu um erro Inesperado. (Contatos): '+E.Message);
+      end;
+  end;
+end;
+
+procedure TContatos.ALteraDados;
+var
+  strSQL: string;
+begin
+  try
+    strSQL :='';
+    frmDatamodulo.DBConect.StartTransaction;
+    QryAuxiliar.Close;
+    QryAuxiliar.SQL.Clear;
+
+    strSQL := ' UPDATE CONTATO                  ' +
+              '    SET Nome       =:Nome,       ' +
+              '        Data_nasc  =:Data_nasc,  ' +
+              '        Idade      =:Idade,      ' +
+              '        Telefone   =:Telefone,   ' +
+              '        Id_Cliente =:Id_Cliente  ' +
+              ' WHERE Id          =:Id          ';
+
+    QryAuxiliar.SQL.Add(strSQL);
+    QryAuxiliar.ParamByName('NOME').AsString        := GetNome;
+    QryAuxiliar.ParamByName('Data_nasc').AsString   := GetData_nasc;
+    QryAuxiliar.ParamByName('Idade').AsString       := GetIdade;
+    QryAuxiliar.ParamByName('Telefone').AsString    := GetTelefone;
+    QryAuxiliar.ParamByName('Id_Cliente').AsInteger := GetId_Cliente;
+    QryAuxiliar.ParamByName('Id').AsInteger         := GetID;
+
+    QryAuxiliar.ExecSQL();
+    frmDatamodulo.DBConect.Commit;
+  except
+    on E: Exception do
+      begin
+        frmDatamodulo.DBConect.Rollback;  //desfaz a transação
+        ShowMessage('Ocorreu um erro Inesperado. (Contatos): '+E.Message);
+      end;
+  end;
+end;
+
+procedure TContatos.PesquisaTabela(strNomeTabela, strCodigo, strNomepesquisa,
+  strValorPesquisa: String);
+begin
+  QryAuxiliar.Close;
+  QryAuxiliar.SQL.Clear;
+  QryAuxiliar.SQL.Add('SELECT ID as Codigo, NOME as Nome ');
+  QryAuxiliar.SQL.Add('FROM ' + trim(strNomeTabela));
+  QryAuxiliar.SQL.Add('WHERE '+trim(strNomepesquisa)+ ' LIKE '+ quotedstr('%'+ trim(strValorPesquisa)+'%'));
+  QryAuxiliar.Open();
+  frmDatamodulo.dsPesquisa.DataSet := QryAuxiliar;
+end;
+
+procedure TContatos.AbreTabela(strNomeTabela, strCodigo, strNomepesquisa: String);
+begin
+  QryAuxiliar.Close;
+  QryAuxiliar.SQL.Clear;
+  QryAuxiliar.SQL.Add('SELECT ID as Codigo, NOME as Nome ');
+  QryAuxiliar.SQL.Add('FROM ' + trim(strNomeTabela));
+  QryAuxiliar.SQL.Add(' Order by '+strCodigo);
+  QryAuxiliar.Open;
+  frmDatamodulo.dsPesquisa.DataSet := QryAuxiliar;
+end;
+
+procedure TContatos.ConsultaContatosGeral(strNomeTabela, strID: String);
+begin
+  QryAuxiliar.Close;
+  QryAuxiliar.SQL.Clear;
+  QryAuxiliar.SQL.Add('SELECT Id, Nome, convert(varchar, Data_nasc, 103) as Data_nasc, Idade, Telefone, Id_Cliente ');
+  QryAuxiliar.SQL.Add('FROM ' + trim(strNomeTabela));
+  QryAuxiliar.SQL.Add('WHERE Id_Cliente ='+strID);
+  QryAuxiliar.SQL.Add(' Order by Id ');
+  QryAuxiliar.Open;
+  frmDatamodulo.dsContatos.DataSet := QryAuxiliar;
+end;
+
+procedure TContatos.SetData_nasc(const Value: string);
+begin
+  FData_nasc := Value;
+end;
+
+procedure TContatos.SetID(const Value: Integer);
+begin
+  FID := Value;
+end;
+
+procedure TContatos.SetIdade(const Value: string);
+begin
+  FIdade := Value;
+end;
+
+procedure TContatos.SetId_Cliente(const Value: Integer);
+begin
+  FId_Cliente := Value;
+end;
+
+procedure TContatos.SetNome(const Value: string);
+begin
+  FNome := Value;
+end;
+
+procedure TContatos.SetTelefone(const Value: string);
+begin
+  FTelefone := Value;
+end;
+
+end.

@@ -1,0 +1,610 @@
+unit View.Principal;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, FMX.TabControl,
+  REST.Types, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, REST.Response.Adapter,
+  REST.Client, Data.Bind.Components, Data.Bind.ObjectScope, System.JSON,
+  Samples.Providers.Frames.Endereco, System.Threading, System.ImageList,
+  FMX.ImgList, FMX.ListBox, FMX.Edit, FMX.DialogService;
+
+type
+  TfrmPrincipal = class(TForm)
+    retHeader: TRectangle;
+    btnMenu: TSpeedButton;
+    retFooter: TRectangle;
+    StyleBook: TStyleBook;
+    lytContent: TLayout;
+    tbcCadEndereco: TTabControl;
+    TbiConsulta: TTabItem;
+    TbiCadastro: TTabItem;
+    vsbEnderecos: TVertScrollBox;
+    RESTClient1: TRESTClient;
+    RESTRequest1: TRESTRequest;
+    RESTResponse1: TRESTResponse;
+    RESTResponseDataSetAdapter: TRESTResponseDataSetAdapter;
+    TBEnderecos: TFDMemTable;
+    TBEnderecosid: TIntegerField;
+    TBEnderecosCep: TWideStringField;
+    TBEnderecosLogradouro: TWideStringField;
+    TBEnderecosComplemento: TWideStringField;
+    TBEnderecosBairro: TWideStringField;
+    TBEnderecosCidade: TWideStringField;
+    TBEnderecosLocalidade: TWideStringField;
+    TBEnderecosuf: TWideStringField;
+    ds_Enderecos: TDataSource;
+    ImageLst: TImageList;
+    txtFooter: TText;
+    btnListar: TButton;
+    btnSalvar: TButton;
+    btnEditar: TButton;
+    btnIncluir: TButton;
+    Nome: TLabel;
+    edtLogradouro: TEdit;
+    lineNome: TLine;
+    lblSobreNome: TLabel;
+    edtComplemento: TEdit;
+    lineSobrenome: TLine;
+    lblBairro: TLabel;
+    edtBairro: TEdit;
+    lineEmail: TLine;
+    cboApi: TComboBox;
+    Label1: TLabel;
+    EdtCep: TEdit;
+    Line1: TLine;
+    Label2: TLabel;
+    btnBuscaCEP: TButton;
+    EdtID: TEdit;
+    Line2: TLine;
+    Label3: TLabel;
+    Label4: TLabel;
+    EdtCidade: TEdit;
+    Line3: TLine;
+    Label5: TLabel;
+    EdtLocalidade: TEdit;
+    Line4: TLine;
+    Label6: TLabel;
+    EdtUF: TEdit;
+    Line5: TLine;
+    btnDeletar: TButton;
+    btnCancelar: TButton;
+    btnBusca: TButton;
+    procedure btnListarClick(Sender: TObject);
+    procedure tbcCadEnderecoChange(Sender: TObject);
+    procedure cboApiExit(Sender: TObject);
+    procedure btnIncluirClick(Sender: TObject);
+    procedure EdtCepExit(Sender: TObject);
+    procedure cboApiKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    procedure EdtCepKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    procedure edtLogradouroKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtComplementoKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtBairroKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure EdtCidadeKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure EdtLocalidadeKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure btnBuscaCEPClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+    procedure btnDeletarClick(Sender: TObject);
+    procedure EdtIDKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    procedure btnBuscaClick(Sender: TObject);
+  private
+    { Private declarations }
+    Objeto,
+    Objt: TJsonObject;
+    ParRows,
+    PRows: TJsonPair;
+    strStatusEnd: string;
+    LFrameEnder: TEnderFrame;
+    procedure LeRegistros;
+    procedure LoadEnderecos;
+    procedure BuscaEndereco(strURL, strAText: string); //busca Enderecos
+    procedure PreencheDataSetEnderecos(strJSONValue: string);
+    procedure BuscaCep(strURL, strAText: string); //busca Cep
+    procedure GravaEndereco;
+    procedure ExcluiDados;
+    procedure PreencheCampos;
+    procedure LimpaCampos;
+    function CharEspeciais(Texto: String): String;
+    function GetDeleteConfirmation(AMessage: String): String;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPrincipal: TfrmPrincipal;
+
+implementation
+
+{$R *.fmx}
+
+{ TfrmPrincipal }
+
+procedure TfrmPrincipal.btnBuscaCEPClick(Sender: TObject);
+begin
+  case cboApi.ItemIndex of
+    0:BuscaCep('https://viacep.com.br/ws/'+trim(EdtCep.Text)+'/json/','');
+    1:BuscaCep('https://cdn.apicep.com/file/apicep/'+trim(EdtCep.Text)+'.json','');
+    2:BuscaCep('https://cep.awesomeapi.com.br/json/'+trim(EdtCep.Text),'');
+  end;
+end;
+
+procedure TfrmPrincipal.btnBuscaClick(Sender: TObject);
+begin
+  BuscaEndereco('http://localhost:9000/v1/enderecobyid/',trim(EdtID.Text));
+  PreencheCampos;
+end;
+
+procedure TfrmPrincipal.btnCancelarClick(Sender: TObject);
+begin
+  strStatusEnd :='';
+end;
+
+procedure TfrmPrincipal.btnDeletarClick(Sender: TObject);
+begin
+  strStatusEnd :='dsExcluindo';
+  TDialogService.MessageDialog(('Deseja Realmente Apagar Esse Endereço?'), system.UITypes.TMsgDlgType.mtConfirmation,
+  [system.UITypes.TMsgDlgBtn.mbYes, system.UITypes.TMsgDlgBtn.mbNo], system.UITypes.TMsgDlgBtn.mbYes,0,
+  procedure (const AResult: System.UITypes.TModalResult)
+  begin
+    case AResult of
+      mrYES:
+      begin
+        ExcluiDados;
+        LeRegistros;
+      end;
+    end;
+  end
+  );
+  strStatusEnd :='';
+end;
+
+procedure TfrmPrincipal.btnEditarClick(Sender: TObject);
+begin
+  strStatusEnd :='dsEditando';
+  EdtID.Locked := False;
+  EdtID.SetFocus;
+end;
+
+procedure TfrmPrincipal.btnIncluirClick(Sender: TObject);
+begin
+  strStatusEnd       :='dsInserindo';
+  LimpaCampos;
+  cboApi.SetFocus;
+  cboApi.DropDown;
+end;
+
+procedure TfrmPrincipal.btnListarClick(Sender: TObject);
+var
+  LTask: ITask;
+begin
+  vsbEnderecos.BeginUpdate;
+  try
+    LTask := TTask.Create(
+      procedure
+      begin
+        Self.LoadEnderecos;
+      end);
+    LTask.Start;
+  finally
+    vsbEnderecos.EndUpdate;
+  end;
+end;
+
+procedure TfrmPrincipal.btnSalvarClick(Sender: TObject);
+begin
+  if (strStatusEnd = 'dsInserindo') or
+     (strStatusEnd = 'dsEditando') then
+  begin
+    GravaEndereco;
+    strStatusEnd :='';
+    ShowMessage('Dados foram gravados com exito.');
+    LimpaCampos;
+    LeRegistros;
+    EdtID.Locked := True;
+    tbcCadEndereco.Previous();
+  end;
+end;
+
+procedure TfrmPrincipal.BuscaCep(strURL, strAText: string);
+begin
+  RESTClient1.BaseURL := strURL + strAText;
+  RESTRequest1.Method := rmGET;
+  RESTRequest1.Execute;
+
+  Objeto  := RESTResponse1.JSONValue as TJSONObject;
+
+  case cboApi.ItemIndex of
+    0:begin
+        //Logradouro
+        ParRows := Objeto.Get('logradouro');
+        edtLogradouro.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Complemento
+        ParRows := Objeto.Get('complemento');
+        edtComplemento.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Bairro
+        ParRows := Objeto.Get('bairro');
+        edtBairro.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Cidade
+        ParRows := Objeto.Get('localidade');
+        EdtCidade.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Localidade
+        ParRows := Objeto.Get('localidade');
+        EdtLocalidade.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Estado
+        ParRows := Objeto.Get('uf');
+        EdtUF.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+      end;
+    1:begin
+        //Logradouro
+        ParRows := Objeto.Get('address');
+        edtLogradouro.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Complemento
+        EdtComplemento.Text := EmptyStr;
+
+        //Bairro
+        ParRows := Objeto.Get('district');
+        EdtBairro.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Cidade
+        ParRows := Objeto.Get('city');
+        EdtCidade.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Localidade
+        EdtLocalidade.Text := EmptyStr;
+
+        //Estado
+        ParRows := Objeto.Get('state');
+        EdtUf.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+      end;
+    2:begin
+        //Logradouro
+        ParRows := Objeto.Get('address');
+        EdtLogradouro.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Complemento
+        EdtComplemento.Text := EmptyStr;
+
+        //Bairro
+        ParRows := Objeto.Get('district');
+        EdtBairro.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Cidade
+        ParRows := Objeto.Get('city');
+        EdtCidade.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+        //Localidade
+        EdtLocalidade.Text := EmptyStr;
+
+        //Estado
+        ParRows := Objeto.Get('state');
+        EdtUf.Text :=CharEspeciais(ParRows.JsonValue.ToString);
+
+      end;
+  end;
+end;
+
+procedure TfrmPrincipal.BuscaEndereco(strURL, strAText: string);
+var
+  I: Integer;
+  strJSON: string;
+begin
+  TBEnderecos.Close;
+  TBEnderecos.Open;
+  TBEnderecos.EmptyDataSet;
+  TBEnderecos.IndexFieldNames := 'id';   //só para order por id
+  TBEnderecos.Close;
+  TBEnderecos.Open;
+
+  RESTClient1.BaseURL := strURL + strAText;
+  RESTRequest1.Method := rmGET;
+  RESTRequest1.Execute;
+
+  if RESTResponse1.StatusCode in [200,201,204] then
+    begin
+      PreencheDataSetEnderecos(RESTResponse1.Content);  //processa o JSon
+    end;
+end;
+
+procedure TfrmPrincipal.cboApiExit(Sender: TObject);
+begin
+  EdtCep.SetFocus;
+end;
+
+procedure TfrmPrincipal.cboApiKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then EdtCep.SetFocus;
+end;
+
+function TfrmPrincipal.CharEspeciais(Texto: String): String;
+var
+  i,t:integer;
+begin
+  t:=length(texto);
+  i:=1;
+  While i <= t do
+    begin
+     if texto[i] in ['0'..'9','a'..'z','A'..'Z',#32] Then
+       result:=result+Texto[i];
+     i:=i+1;
+    end;
+end;
+
+procedure TfrmPrincipal.edtBairroKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then EdtCidade.SetFocus;
+end;
+
+procedure TfrmPrincipal.EdtCepExit(Sender: TObject);
+begin
+  if (Trim(EdtCep.Text).Length = 8) and (EdtCep.Text <> '') then
+  begin
+    EdtCep.Text := Copy(EdtCep.Text,1,2)+''+Copy(EdtCep.Text,3,3)+'-'+Copy(EdtCep.Text,6,3);
+  end;
+end;
+
+procedure TfrmPrincipal.EdtCepKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then edtLogradouro.SetFocus;
+end;
+
+procedure TfrmPrincipal.EdtCidadeKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then EdtLocalidade.SetFocus;
+end;
+
+procedure TfrmPrincipal.edtLogradouroKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then edtComplemento.SetFocus;
+end;
+
+procedure TfrmPrincipal.ExcluiDados;
+begin
+  if strStatusEnd ='dsExcluindo' then
+    begin
+      try
+        Showmessage('Atenção! Os Endereço serão excluidos.');
+        RESTClient1.BaseURL := 'http://localhost:9000/v1/endereco/' + EdtID.Text;
+        RESTRequest1.Method := rmDELETE;
+        RESTRequest1.Execute;
+
+        RESTClient1.BaseURL   :='';
+        RESTRequest1.Resource :='';
+        RESTRequest1.Method   := rmGET;
+        RESTRequest1.AddBody('');
+      finally
+        RESTClient1.BaseURL   :='';
+        RESTRequest1.Resource :='';
+        RESTRequest1.Method   := rmGET;
+        RESTRequest1.AddBody('');
+      end;
+    end;
+end;
+
+function TfrmPrincipal.GetDeleteConfirmation(AMessage: String): String;
+var
+  lResult: String;
+begin
+  lResult:='';
+  TDialogService.PreferredMode:=TDialogService.TPreferredMode.Platform;
+  TDialogService.MessageDialog(AMessage, TMsgDlgType.mtConfirmation,
+    [ TMsgDlgBtn.mbYes, TMsgDlgBtn.mbCancel ], TMsgDlgBtn.mbCancel, 0,
+    procedure(const AResult: TModalResult)
+    begin
+      case AResult of
+        mrYes:    lResult:='Y';
+        mrCancel: lResult:='C';
+      end;
+    end);
+
+  Result:=lResult;
+end;
+
+procedure TfrmPrincipal.GravaEndereco;
+var
+  oJson: TJSONObject;
+begin
+  if strStatusEnd ='dsInserindo' then
+    begin
+      try
+        RESTClient1.BaseURL       := 'http://localhost:9000/v1/';
+        RESTRequest1.Resource     :='endereco';
+        RESTRequest1.Method       := rmPOST;
+        oJson := TJSONObject.Create;
+        oJson.AddPair('cep'        , EdtCep.Text);
+        oJson.AddPair('logradouro' , EdtLogradouro.Text);
+        oJson.AddPair('complemento', EdtComplemento.Text);
+        oJson.AddPair('bairro'     , EdtBairro.Text);
+        oJson.AddPair('cidade'     , EdtCidade.Text);
+        oJson.AddPair('localidade' , EdtLocalidade.Text);
+        oJson.AddPair('uf'         , EdtUf.Text);
+        RESTRequest1.AddBody(oJson);
+        RESTRequest1.Execute;
+      finally
+        oJson.Free;
+        RESTClient1.BaseURL   :='';
+        RESTRequest1.Resource :='';
+        RESTRequest1.Method   := rmGET;
+        RESTRequest1.AddBody('');
+      end;
+    end
+  else
+    if strStatusEnd ='dsEditando' then
+      begin
+        try
+          RESTClient1.BaseURL       := 'http://localhost:9000/v1/';
+          RESTRequest1.Resource     :='endereco';
+          RESTRequest1.Method       := rmPUT;
+          oJson := TJSONObject.Create;
+          oJson.AddPair('id'         , TJSONNumber.Create(EdtID.Text.ToInteger()));
+          oJson.AddPair('cep'        , EdtCep.Text);
+          oJson.AddPair('logradouro' , EdtLogradouro.Text);
+          oJson.AddPair('complemento', EdtComplemento.Text);
+          oJson.AddPair('bairro'     , EdtBairro.Text);
+          oJson.AddPair('cidade'     , EdtCidade.Text);
+          oJson.AddPair('localidade' , EdtLocalidade.Text);
+          oJson.AddPair('uf'         , EdtUf.Text);
+          RESTRequest1.AddBody(oJson);
+          RESTRequest1.Execute;
+        finally
+          oJson.Free;
+          RESTClient1.BaseURL   :='';
+          RESTRequest1.Resource :='';
+          RESTRequest1.Method   := rmGET;
+          RESTRequest1.AddBody('');
+        end;
+      end;
+end;
+
+procedure TfrmPrincipal.edtComplementoKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then edtBairro.SetFocus;
+end;
+
+procedure TfrmPrincipal.EdtIDKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then edtLogradouro.SetFocus;
+end;
+
+procedure TfrmPrincipal.EdtLocalidadeKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if key = vkReturn then EdtUF.SetFocus;
+end;
+
+procedure TfrmPrincipal.LeRegistros;
+begin
+  btnListarClick(Self);
+end;
+
+procedure TfrmPrincipal.LimpaCampos;
+begin
+  EdtCep.Text        := EmptyStr;
+  EdtID.Text         := '0';
+  edtLogradouro.Text := EmptyStr;
+  edtComplemento.Text:= EmptyStr;
+  edtBairro.Text     := EmptyStr;
+  EdtCidade.Text     := EmptyStr;
+  EdtLocalidade.Text := EmptyStr;
+  EdtUF.Text         := EmptyStr;
+end;
+
+procedure TfrmPrincipal.LoadEnderecos;
+begin
+  //busca todos os endereços
+  BuscaEndereco('http://localhost:9000/v1/endereco','');
+  LimpavsbEnderecos;
+  TBEnderecos.First;
+  while not TBEnderecos.Eof do
+  begin
+    TThread.Synchronize(TThread.Current,
+      procedure
+      begin
+        LFrameEnder := TEnderFrame.Create(vsbEnderecos);
+        LFrameEnder.Parent := vsbEnderecos;
+        LFrameEnder.Name := 'EnderFrame' + TBEnderecos.RecNo.ToString;
+        LFrameEnder.Align := TAlignLayout.Top;
+        LFrameEnder.lblID.Text         := TBEnderecos.FieldByName('ID').AsString;
+        LFrameEnder.lblCep.Text        := TBEnderecos.FieldByName('CEP').AsString;
+        LFrameEnder.lblLogradouro.Text := TBEnderecos.FieldByName('LOGRADOURO').AsString;
+        LFrameEnder.lblBairro.Text     := TBEnderecos.FieldByName('BAIRRO').AsString;
+        LFrameEnder.lblCidade.Text     := TBEnderecos.FieldByName('CIDADE').AsString;
+        LFrameEnder.lblUF.Text         := TBEnderecos.FieldByName('UF').AsString;
+      end);
+    TBEnderecos.Next;
+  end;
+end;
+
+procedure TfrmPrincipal.PreencheCampos;
+begin
+  EDTid.Text          := ds_Enderecos.DataSet.FieldByName('id').AsString;
+  EdtCEP.Text         := ds_Enderecos.DataSet.FieldByName('cep').AsString;
+  EDTLogradouro.Text  := ds_Enderecos.DataSet.FieldByName('logradouro').AsString;
+  EDTComplemento.Text := ds_Enderecos.DataSet.FieldByName('complemento').AsString;
+  EDTBairro.Text      := ds_Enderecos.DataSet.FieldByName('bairro').AsString;
+  EDTCidade.Text      := ds_Enderecos.DataSet.FieldByName('cidade').AsString;
+  EDTLocalidade.Text  := ds_Enderecos.DataSet.FieldByName('localidade').AsString;
+  EDTUf.Text          := ds_Enderecos.DataSet.FieldByName('uf').AsString;
+end;
+
+procedure TfrmPrincipal.PreencheDataSetEnderecos(strJSONValue: string);
+var
+  JsonObjArray: TJSONArray;
+  JsonObjectJson: TJSONObject;
+  strTOJSon: string;
+  I: Integer;
+begin
+  //Processa o JSon para DataSet - Horse
+  Application.ProcessMessages;
+
+  JsonObjArray := TJSONObject.ParseJSONValue( strJSONValue ) as TJSONArray;
+
+  for I := 0 to JsonObjArray.Count-1 do
+    begin
+      strTOJSon := JsonObjArray.Items[I].ToJSON;
+      JsonObjectJson := TJSONObject.ParseJSONValue( strTOJSon ) as TJSONObject;
+
+      TBEnderecos.Insert;
+      TBEnderecosid.AsString          := JsonObjectJson.GetValue('id').Value;
+      TBEnderecosCep.AsString         := JsonObjectJson.GetValue('cep').Value;
+      TBEnderecosLogradouro.AsString  := JsonObjectJson.GetValue('logradouro').Value;
+      TBEnderecosComplemento.AsString := JsonObjectJson.GetValue('complemento').Value;
+      TBEnderecosBairro.AsString      := JsonObjectJson.GetValue('bairro').Value;
+      TBEnderecosCidade.AsString      := JsonObjectJson.GetValue('cidade').Value;
+      TBEnderecosLocalidade.AsString  := JsonObjectJson.GetValue('localidade').Value;
+      TBEnderecosuf.AsString          := JsonObjectJson.GetValue('uf').Value;
+      TBEnderecos.Post;
+    end;
+end;
+
+procedure TfrmPrincipal.tbcCadEnderecoChange(Sender: TObject);
+begin
+  if tbcCadEndereco.TabIndex = 1 then
+  begin
+    btnListar.Enabled := False;
+    btnSalvar.Enabled := True;
+    btnIncluir.Enabled:= True;
+    btnEditar.Enabled := True;
+    btnCancelar.Enabled := True;
+    btnDeletar.Enabled := True;
+  end
+  else
+  begin
+    btnListar.Enabled := True;
+    btnSalvar.Enabled := False;
+    btnIncluir.Enabled:= False;
+    btnEditar.Enabled := False;
+    btnCancelar.Enabled := False;
+    btnDeletar.Enabled := False;
+  end;
+end;
+
+end.

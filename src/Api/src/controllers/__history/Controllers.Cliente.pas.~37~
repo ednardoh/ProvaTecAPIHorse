@@ -1,0 +1,138 @@
+unit Controllers.Cliente;
+
+interface
+
+uses Horse, Services.Cliente, DataSet.Serialize, System.JSON, Data.DB,
+     DAO.Cliente, System.SysUtils;
+
+procedure Registry;
+procedure ListByNome(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure ListAll(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+implementation
+
+Uses Model.Cliente;
+
+//Lista de clientes
+procedure ListByNome(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOClientes: TClienteDAO;
+  strNome: string;
+begin
+  try
+    LDAOClientes := TClienteDAO.Create;
+    strNome := Req.Params.Items['Nome'];
+    Res.Send<TJSONArray>(LDAOClientes.ListByNome(strNome));
+  finally
+    LDAOClientes.Free;
+  end;
+end;
+
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOClientes: TClienteDAO;
+  iId: Integer;
+begin
+  try
+    LDAOClientes := TClienteDAO.Create;
+    iId := StrToInt(Req.Params.Items['id']);
+    Res.Send<TJSONArray>(LDAOClientes.ListById(iId));
+  finally
+    LDAOClientes.Free;
+  end;
+end;
+
+procedure ListAll(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOClientes: TClienteDAO;
+begin
+  try
+    LDAOClientes := TClienteDAO.Create;
+    Res.Send<TJSONArray>(LDAOClientes.ListAll);
+  finally
+    LDAOClientes.Free;
+  end;
+end;
+
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOClientes: TClienteDAO;
+  oJson: TJSONObject;
+  ClienteModel: TModelCliente;
+begin
+  try
+    if Req.Body.IsEmpty then
+      raise Exception.Create('Dados do Cliente não encontrado.');
+    LDAOClientes := TClienteDAO.Create;
+    ClienteModel := TModelCliente.Create;
+    oJson := Req.Body<TJSONObject>;
+    ClienteModel.id          := 0;
+    ClienteModel.cpf         := oJson.GetValue<string>('cpf');
+    ClienteModel.nome        := oJson.GetValue<string>('nome');
+    ClienteModel.cep         := oJson.GetValue<string>('cep');
+    ClienteModel.logradouro  := oJson.GetValue<string>('logradouro');
+    ClienteModel.numero      := oJson.GetValue<string>('numero');
+    ClienteModel.complemento := oJson.GetValue<string>('complemento');
+    ClienteModel.bairro      := oJson.GetValue<string>('bairro');
+    ClienteModel.cidade      := oJson.GetValue<string>('cidade');
+    ClienteModel.ibge_cidade := oJson.GetValue<string>('ibge_cidade');
+    ClienteModel.sigla_uf    := oJson.GetValue<string>('sigla_uf');
+    LDAOClientes.Insert(ClienteModel);
+    Res.Send<TJSONObject>(oJson).Status(THTTPStatus.Created);
+  finally
+    LDAOClientes.Free;
+    ClienteModel.Free;
+  end;
+end;
+
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOClientes: TClienteDAO;
+  oJson: TJSONObject;
+  ClienteModel: TModelCliente;
+begin
+  try
+    if Req.Body.IsEmpty then
+      raise Exception.Create('Dados do Cliente não encontrado.');
+    LDAOClientes := TClienteDAO.Create;
+    ClienteModel := TModelCliente.Create;
+    oJson := Req.Body<TJSONObject>;
+    ClienteModel.id          := 0;
+    ClienteModel.cpf         := oJson.GetValue<string>('cpf');
+    ClienteModel.nome        := oJson.GetValue<string>('nome');
+    ClienteModel.cep         := oJson.GetValue<string>('cep');
+    ClienteModel.logradouro  := oJson.GetValue<string>('logradouro');
+    ClienteModel.numero      := oJson.GetValue<string>('numero');
+    ClienteModel.complemento := oJson.GetValue<string>('complemento');
+    ClienteModel.bairro      := oJson.GetValue<string>('bairro');
+    ClienteModel.cidade      := oJson.GetValue<string>('cidade');
+    ClienteModel.ibge_cidade := oJson.GetValue<string>('ibge_cidade');
+    ClienteModel.sigla_uf    := oJson.GetValue<string>('sigla_uf');
+    LDAOClientes.(ClienteModel);
+    Res.Send<TJSONObject>(oJson).Status(THTTPStatus.Created);
+  finally
+    LDAOClientes.Free;
+    ClienteModel.Free;
+  end;
+end;
+
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+  //
+end;
+
+procedure Registry;
+begin
+  THorse.Get('/clientesbynome/:Nome', ListByNome);  //Lista de Clientes
+  THorse.Get('/clientesbyid/:id'    , ListById);
+  THorse.Get('/clientesall'         , ListAll);
+  THorse.Post('/clienteinsert'      , Insert);
+  THorse.Put('/clienteupdate'       , Update);
+  THorse.Delete('/clientedelete'    , Delete);
+end;
+
+end.

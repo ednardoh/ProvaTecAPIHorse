@@ -1,0 +1,29 @@
+program ProvaTecnica;
+
+uses
+  Vcl.Forms,
+  uPrincipal in 'uPrincipal.pas' {frmPrincipal},
+  uDatamodulo in 'uDatamodulo.pas' {frmDatamodulo: TDataModule},
+  UConecta in 'UConecta.pas',
+  UConexaoBDpas in 'UConexaoBDpas.pas' {frmConectaDB},
+  uPesquisa in 'uPesquisa.pas' {FrmPesquisa},
+  uCadCliente in 'uCadCliente.pas' {frmCadCliente},
+  uCadFormBase in 'uCadFormBase.pas' {frmCadFormBase},
+  superobject in 'Classes\superobject.pas',
+  supertypes in 'Classes\supertypes.pas',
+  superdate in 'Classes\superdate.pas',
+  supertimezone in 'Classes\supertimezone.pas',
+  uCadContato in 'uCadContato.pas' {frmCadContato},
+  uCadTipopgto in 'uCadTipopgto.pas' {frmCadTipopgto},
+  uCadCredor in 'uCadCredor.pas' {frmCadCredor},
+  uCadParcela in 'uCadParcela.pas' {frmCadParcela};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmDatamodulo, frmDatamodulo);
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.Run;
+end.

@@ -1,0 +1,26 @@
+unit Controller.ConsultaDividas;
+
+interface
+
+uses Horse, DataSet.Serialize, System.JSON, Data.DB,
+     DAO.ConsultaDividas, System.SysUtils;
+
+
+procedure Registry;
+procedure ListDividasByCPF(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+implementation
+
+Uses Model.ConsultaDividas;
+
+procedure ListDividasByCPF(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Registry;
+begin
+
+end;
+
+end.

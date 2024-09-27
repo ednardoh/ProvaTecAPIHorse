@@ -1,0 +1,47 @@
+unit Controllers.Tipopgto;
+
+interface
+
+uses Horse, DataSet.Serialize, System.JSON, Data.DB,
+     DAO.Tipopgto, System.SysUtils;
+
+procedure Registry;
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+implementation
+
+Uses Model.Tipopgto;
+
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Registry;
+begin
+  THorse.Get('/tipopgtobyid/:id', ListById);
+  THorse.Post('/tipopgtoinsert', Insert);
+  THorse.Put('/tipopgtoupdate', Update);
+  THorse.Delete('/tipopgtodeletebyid/:id', Delete);
+end;
+
+
+end.

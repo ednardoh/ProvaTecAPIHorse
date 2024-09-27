@@ -1,0 +1,19 @@
+unit Model.Cliente;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections;
+
+type TModelCliente = class
+  private
+
+  public
+
+
+end;
+
+implementation
+
+end.

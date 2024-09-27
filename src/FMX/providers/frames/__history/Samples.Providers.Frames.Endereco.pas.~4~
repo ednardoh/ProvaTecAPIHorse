@@ -1,0 +1,32 @@
+unit Samples.Providers.Frames.Endereco;
+
+interface
+
+uses System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, FMX.Types, FMX.Graphics, FMX.Controls,
+  FMX.Forms, FMX.Dialogs, FMX.StdCtrls, FMX.Objects, FMX.Layouts, FMX.Controls.Presentation;
+
+type
+  TEnderFrame = class(TFrame)
+    Layout2: TLayout;
+    Label1: TLabel;
+    Label2: TLabel;
+    lblLogradouro: TLabel;
+    lblBairro: TLabel;
+    Rectangle1: TRectangle;
+    Label3: TLabel;
+    lblID: TLabel;
+    Label4: TLabel;
+    lblCep: TLabel;
+    Label5: TLabel;
+    lblCidade: TLabel;
+    Label6: TLabel;
+    lblUF: TLabel;
+    Line1: TLine;
+    Line2: TLine;
+  end;
+
+implementation
+
+{$R *.fmx}
+
+end.

@@ -1,0 +1,299 @@
+unit DAO.Credor;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections, Model.Credor;
+
+type TCredorDAO = class
+  private
+    FConexao: TConexao;
+  public
+    constructor Create;
+
+    function ListByNome(ANome: string) : TJSONArray;
+    function ListById(AId: Integer)    : TJSONArray;
+    function ListAll()                 : TJSONArray;
+    procedure Insert(ACredorModel: TModelCredor);
+    procedure Update(ACredorModel: TModelCredor);
+    procedure Delete(AId: Integer);
+
+end;
+
+implementation
+
+{ TCredorDAO }
+
+constructor TCredorDAO.Create;
+begin
+  FConexao := TControllersConexao.GetInstance().Conexao;
+end;
+
+procedure TCredorDAO.Insert(ACredorModel: TModelCredor);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.ExecSQL('insert into tb_credores(cpf_cnpj,     '+
+                   '                        nome,         '+
+                   '                        cep,          '+
+                   '                        logradouro,   '+
+                   '                        numero,       '+
+                   '                        complemento,  '+
+                   '                        bairro,       '+
+                   '                        cidade,       '+
+                   '                        ibge_cidade,  '+
+                   '                        sigla_uf)     '+
+                   'values (                              '+
+                   '                        :cpf_cnpj,    '+
+                   '                        :nome,        '+
+                   '                        :cep,         '+
+                   '                        :logradouro,  '+
+                   '                        :numero,      '+
+                   '                        :complemento, '+
+                   '                        :bairro,      '+
+                   '                        :cidade,      '+
+                   '                        :ibge_cidade, '+
+                   '                        :sigla_uf)    ',
+      [ACredorModel.cpfcnpj,
+       ACredorModel.Nome,
+       ACredorModel.cep,
+       ACredorModel.logradouro,
+       ACredorModel.numero,
+       ACredorModel.complemento,
+       ACredorModel.bairro,
+       ACredorModel.cidade,
+       ACredorModel.ibge_cidade,
+       ACredorModel.sigla_uf]);
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TCredorDAO.Update(ACredorModel: TModelCredor);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('update tb_credores set  cpf_cnpj   =:cpf_cnpj,     '+
+                   '                        nome       =:nome,         '+
+                   '                        cep        =:cep,          '+
+                   '                        logradouro =:logradouro,   '+
+                   '                        numero     =:numero,       '+
+                   '                        complemento=:complemento,  '+
+                   '                        bairro     =:bairro,       '+
+                   '                        cidade     =:cidade,       '+
+                   '                        ibge_cidade=:ibge_cidade,  '+
+                   '                        sigla_uf   =:sigla_uf      '+
+                   ' where id=:id                                      ');
+
+      vQry.ParamByName('id').AsInteger         := ACredorModel.id;
+      vQry.ParamByName('cpf_cnpj').AsString    := ACredorModel.cpfcnpj;
+      vQry.ParamByName('Nome').AsString        := ACredorModel.Nome;
+      vQry.ParamByName('cep').AsString         := ACredorModel.cep;
+      vQry.ParamByName('logradouro').AsString  := ACredorModel.logradouro;
+      vQry.ParamByName('numero').AsString      := ACredorModel.numero;
+      vQry.ParamByName('complemento').AsString := ACredorModel.complemento;
+      vQry.ParamByName('bairro').AsString      := ACredorModel.bairro;
+      vQry.ParamByName('cidade').AsString      := ACredorModel.cidade;
+      vQry.ParamByName('ibge_cidade').AsString := ACredorModel.ibge_cidade;
+      vQry.ParamByName('sigla_uf').AsString    := ACredorModel.sigla_uf;
+
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TCredorDAO.Delete(AId: Integer);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('delete from tb_credores where id=:id ');
+      vQry.ParamByName('id').AsInteger := AId;
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TCredorDAO.ListAll: TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('select c.id,           ' +
+                 '       c.cpfcnpj,      ' +
+                 '       c.nome,         ' +
+                 '       c.cep,          ' +
+                 '       c.logradouro,   ' +
+                 '       c.numero,       ' +
+                 '       c.complemento,  ' +
+                 '       c.bairro,       ' +
+                 '       c.cidade,       ' +
+                 '       c.ibge_cidade,  ' +
+                 '       c.sigla_uf      ' +
+                 'from tb_credores c     ');
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id'         , TJSONNumber.Create(vQry.FieldByName('id').AsInteger));
+        oJson.AddPair('cpfcnpj'    , vQry.FieldByName('cpfcnpj').AsString);
+        oJson.AddPair('nome'       , vQry.FieldByName('nome').AsString);
+        oJson.AddPair('cep'        , vQry.FieldByName('cep').AsString);
+        oJson.AddPair('logradouro' , vQry.FieldByName('logradouro').AsString);
+        oJson.AddPair('numero'     , vQry.FieldByName('numero').AsString);
+        oJson.AddPair('complemento', vQry.FieldByName('complemento').AsString);
+        oJson.AddPair('bairro'     , vQry.FieldByName('bairro').AsString);
+        oJson.AddPair('cidade'     , vQry.FieldByName('cidade').AsString);
+        oJson.AddPair('ibge_cidade', vQry.FieldByName('ibge_cidade').AsString);
+        oJson.AddPair('sigla_uf'   , vQry.FieldByName('sigla_uf').AsString);
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TCredorDAO.ListById(AId: Integer): TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry  := FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('select c.id,           ' +
+                 '       c.cpfcnpj,      ' +
+                 '       c.nome,         ' +
+                 '       c.cep,          ' +
+                 '       c.logradouro,   ' +
+                 '       c.numero,       ' +
+                 '       c.complemento,  ' +
+                 '       c.bairro,       ' +
+                 '       c.cidade,       ' +
+                 '       c.ibge_cidade,  ' +
+                 '       c.sigla_uf      ' +
+                 'from tb_credores c     ' +
+                 ' where c.id Like :id   ');
+    vQry.ParamByName('id').AsInteger := AId;
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id'         , TJSONNumber.Create(vQry.FieldByName('id').AsInteger));
+        oJson.AddPair('cpfcnpj'    , vQry.FieldByName('cpfcnpj').AsString);
+        oJson.AddPair('nome'       , vQry.FieldByName('nome').AsString);
+        oJson.AddPair('cep'        , vQry.FieldByName('cep').AsString);
+        oJson.AddPair('logradouro' , vQry.FieldByName('logradouro').AsString);
+        oJson.AddPair('numero'     , vQry.FieldByName('numero').AsString);
+        oJson.AddPair('complemento', vQry.FieldByName('complemento').AsString);
+        oJson.AddPair('bairro'     , vQry.FieldByName('bairro').AsString);
+        oJson.AddPair('cidade'     , vQry.FieldByName('cidade').AsString);
+        oJson.AddPair('ibge_cidade', vQry.FieldByName('ibge_cidade').AsString);
+        oJson.AddPair('sigla_uf'   , vQry.FieldByName('sigla_uf').AsString);
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TCredorDAO.ListByNome(ANome: string): TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('select c.id,           ' +
+                 '       c.cpfcnpj,      ' +
+                 '       c.nome,         ' +
+                 '       c.cep,          ' +
+                 '       c.logradouro,   ' +
+                 '       c.numero,       ' +
+                 '       c.complemento,  ' +
+                 '       c.bairro,       ' +
+                 '       c.cidade,       ' +
+                 '       c.ibge_cidade,  ' +
+                 '       c.sigla_uf      ' +
+                 'from tb_credores c     ');
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id'         , TJSONNumber.Create(vQry.FieldByName('id').AsInteger));
+        oJson.AddPair('cpfcnpj'    , vQry.FieldByName('cpfcnpj').AsString);
+        oJson.AddPair('nome'       , vQry.FieldByName('nome').AsString);
+        oJson.AddPair('cep'        , vQry.FieldByName('cep').AsString);
+        oJson.AddPair('logradouro' , vQry.FieldByName('logradouro').AsString);
+        oJson.AddPair('numero'     , vQry.FieldByName('numero').AsString);
+        oJson.AddPair('complemento', vQry.FieldByName('complemento').AsString);
+        oJson.AddPair('bairro'     , vQry.FieldByName('bairro').AsString);
+        oJson.AddPair('cidade'     , vQry.FieldByName('cidade').AsString);
+        oJson.AddPair('ibge_cidade', vQry.FieldByName('ibge_cidade').AsString);
+        oJson.AddPair('sigla_uf'   , vQry.FieldByName('sigla_uf').AsString);
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+end.

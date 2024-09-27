@@ -1,0 +1,258 @@
+unit uClsClienteHorse;
+
+interface
+
+uses Generics.Collections, System.StrUtils, REST.Types, Rest.Json, uClsBaseRestHorse,
+     System.SysUtils;
+
+
+type
+
+TConfigMethod = (tpCliente, tpAutenticar);
+
+TCliHorseClass = class
+private
+  FBairro: String;
+  FCep: String;
+  FCidade: String;
+  FComplemento: String;
+  FIbgeCidade: String;
+  FIbgeUf: String;
+  FId: Integer;
+  FLogradouro: String;
+  FNome: String;
+  FNumero: String;
+  FSiglaUf: String;
+public
+  property bairro: String read FBairro write FBairro;
+  property cep: String read FCep write FCep;
+  property cidade: String read FCidade write FCidade;
+  property complemento: String read FComplemento write FComplemento;
+  property ibgeCidade: String read FIbgeCidade write FIbgeCidade;
+  property ibgeUf: String read FIbgeUf write FIbgeUf;
+  property id: Integer read FId write FId;
+  property logradouro: String read FLogradouro write FLogradouro;
+  property nome: String read FNome write FNome;
+  property numero: String read FNumero write FNumero;
+  property siglaUf: String read FSiglaUf write FSiglaUf;
+  function ToJsonString: string;
+  class function FromJsonString(AJsonString: string): TCliHorseClass;
+end;
+
+THorseCliClass = class
+private
+  FItems: TArray<TCliHorseClass>;
+public
+  property Items: TArray<TCliHorseClass> read FItems write FItems;
+  destructor Destroy; override;
+  function ToJsonString: string;
+  class function FromJsonString(AJsonString: string): THorseCliClass;
+end;
+
+{Autenticação no Rest}
+TAutenticacaoClass = class
+private
+  FAccess_token: String;
+  FExpires_in: Extended;
+  FRefresh_token: String;
+  FRefresh_token_expires_in: Extended;
+  FToken_type: String;
+public
+  property access_token: String read FAccess_token write FAccess_token;
+  property expires_in: Extended read FExpires_in write FExpires_in;
+  property refresh_token: String read FRefresh_token write FRefresh_token;
+  property refresh_token_expires_in: Extended read FRefresh_token_expires_in write FRefresh_token_expires_in;
+  property token_type: String read FToken_type write FToken_type;
+  function ToJsonString: string;
+  class function FromJsonString(AJsonString: string): TAutenticacaoClass;
+end;
+
+TClienteRest = class(TClasseRest)
+private
+    FTipoConfig: TConfigMethod;
+    FAPIAut: TAutenticacaoClass;
+    FAPICli: THorseCliClass;
+    procedure ConfigurarAmbiente; override;
+
+  { private declarations }
+public
+    property TipoConfig: TConfigMethod read FTipoConfig write FTipoConfig;
+    property APIAut: TAutenticacaoClass read FAPIAut write FAPIAut;
+    property APICli: THorseCliClass read FAPICli write FAPICli;
+
+  { public declarations }
+
+  constructor create; override;
+  destructor destroy; override;
+
+  procedure getClientes;
+  procedure postAutenticar;
+
+end;
+
+{Rotina que vai processar o JSon e gravar num DataSet}
+THavanProcessa = class
+private
+    FRest: TClienteRest;
+  { private declarations }
+public
+   property Rest: TClienteRest read FRest write FRest;
+   procedure prProcessa(strBaseURL: string);
+
+  { public declarations }
+  constructor create;
+  destructor destroy;
+
+end;
+
+implementation
+
+{TItemClass}
+
+function TCliHorseClass.ToJsonString: string;
+begin
+  result := TJson.ObjectToJsonString(self);
+end;
+
+class function TCliHorseClass.FromJsonString(AJsonString: string): TCliHorseClass;
+begin
+  result := TJson.JsonToObject<TCliHorseClass>(AJsonString)
+end;
+
+{THorseCliClass}
+
+destructor THorseCliClass.Destroy;
+var
+  LItemsItem: TCliHorseClass;
+begin
+
+ for LItemsItem in FItems do
+   LItemsItem.free;
+
+  inherited;
+end;
+
+function THorseCliClass.ToJsonString: string;
+begin
+  result := TJson.ObjectToJsonString(self);
+end;
+
+class function THorseCliClass.FromJsonString(AJsonString: string): THorseCliClass;
+begin
+  result := TJson.JsonToObject<THorseCliClass>(AJsonString)
+end;
+
+{ TAutenticacaoClass }
+
+class function TAutenticacaoClass.FromJsonString(AJsonString: string): TAutenticacaoClass;
+begin
+  result := TJson.JsonToObject<TAutenticacaoClass>(AJsonString)
+end;
+
+function TAutenticacaoClass.ToJsonString: string;
+begin
+ result := TJson.ObjectToJsonString(self);
+end;
+
+{ TClienteRest }
+
+procedure TClienteRest.ConfigurarAmbiente;
+begin
+  inherited;
+
+  Requeste.Params.Clear;
+
+  if FTipoConfig = tpAutenticar then
+    begin
+      with Requeste.Params.AddItem do
+        begin
+          ContentType := ctNone;
+          name        := 'Content-Type';
+          Value       := 'application/x-www-form-urlencoded';
+          Kind        := pkHTTPHEADER;
+          Options     := [poDoNotEncode];
+        end;
+
+      with Requeste.Params.AddItem do
+        begin
+          ContentType := ctNone;
+          name        := 'grant_type';
+          Value       := 'password';
+          Kind        := pkGETorPOST;
+          Options     := [poDoNotEncode];
+        end;
+
+    end;
+
+  if FTipoConfig = tpCliente then
+    begin
+      with Requeste.Params.AddItem do
+        begin
+          ContentType := ctNone;
+          name        := 'Content-Type';
+          Value       := 'application/json';
+          Kind        := pkHTTPHEADER;
+          Options     := [poDoNotEncode];
+        end;
+    end;
+
+end;
+
+constructor TClienteRest.create;
+begin
+  inherited;
+  APIAut := TAutenticacaoClass.Create;
+  FAPICli := THorseCliClass.Create;
+end;
+
+destructor TClienteRest.destroy;
+begin
+  APIAut.Free;
+  FAPICli.Free;
+  inherited;
+end;
+
+procedure TClienteRest.getClientes;
+var
+ strJSonValue: string;
+begin
+  FTipoConfig := tpCliente;
+  ConfigurarAmbiente;
+  Requeste.Execute;
+  strJSonValue := StringReplace(Response.Content,'[','',[rfReplaceAll, rfIgnoreCase]);
+  strJSonValue := StringReplace(strJSonValue,']','',[rfReplaceAll, rfIgnoreCase]);
+  if Response.StatusCode in [200,201,204] then
+    begin
+      FAPICli := FAPICli.FromJsonString(strJSonValue);
+    end;
+end;
+
+procedure TClienteRest.postAutenticar;
+begin
+  FTipoConfig := tpAutenticar;
+  ConfigurarAmbiente;
+
+  Requeste.Execute;
+end;
+
+{ THavanProcessa }
+
+constructor THavanProcessa.create;
+begin
+  FRest := TClienteRest.create;
+end;
+
+destructor THavanProcessa.destroy;
+begin
+  FRest.Free;
+end;
+
+procedure THavanProcessa.prProcessa(strBaseURL: string);
+begin
+  FRest.BaseUrl := strBaseURL;
+  FRest.Metodo  := rmGET;
+  FRest.postAutenticar;
+  FRest.getClientes;
+end;
+
+end.

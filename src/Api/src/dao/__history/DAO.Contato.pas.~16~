@@ -1,0 +1,196 @@
+unit DAO.Contato;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections, Model.Contato;
+
+type TContatoDAO = class
+  private
+    FConexao: TConexao;
+  public
+    constructor Create;
+
+    function ListByIdCliente(AId: Integer)    : TJSONArray;
+    procedure Insert(AContatoModel: TModelContato);
+    procedure Update(AContatoModel: TModelContato);
+    procedure DeleteById(AId: Integer);
+    procedure DeleteByIdCliente(AId: Integer);
+
+end;
+
+implementation
+
+{ DAOContato }
+
+constructor TContatoDAO.Create;
+begin
+  FConexao := TControllersConexao.GetInstance().Conexao;
+end;
+
+function TContatoDAO.ListByIdCliente(AId: Integer): TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('select c.id_contato,  ' +
+                 '       c.nome,        ' +
+                 '       c.data_nasc,   ' +
+                 '       c.idade,       ' +
+                 '       c.telefone,    ' +
+                 '       c.id_cliente   ' +
+                 'from tb_contatos c    ' +
+                 ' where c.id_cliente=:id_cliente ');
+    vQry.ParamByName('id_cliente').AsInteger := AId;
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id_contato' , TJSONNumber.Create(vQry.FieldByName('id_contato').AsInteger));
+        oJson.AddPair('nome'       , vQry.FieldByName('nome').AsString);
+        oJson.AddPair('data_nasc'  , vQry.FieldByName('data_nasc').AsString);
+        oJson.AddPair('idade'      , vQry.FieldByName('idade').AsString);
+        oJson.AddPair('telefone'   , vQry.FieldByName('telefone').AsString);
+        oJson.AddPair('id_cliente' , vQry.FieldByName('id_cliente').AsString);
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+procedure TContatoDAO.Insert(AContatoModel: TModelContato);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('insert into tb_contatos(nome,         '+
+                   '                        data_nasc,    '+
+                   '                        idade,        '+
+                   '                        telefone,     '+
+                   '                        id_cliente)   '+
+                   'values (                :nome,        '+
+                   '                        :data_nasc,   '+
+                   '                        :idade,       '+
+                   '                        :telefone,    '+
+                   '                        :id_cliente)  ');
+
+      vQry.ParamByName('nome').AsString        := AContatoModel.nome;
+      vQry.ParamByName('data_nasc').AsString   := AContatoModel.data_nasc;
+      vQry.ParamByName('idade').AsInteger      := AContatoModel.idade;
+      vQry.ParamByName('telefone').AsString    := AContatoModel.telefone;
+      vQry.ParamByName('id_cliente').AsInteger := AContatoModel.id_cliente;
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TContatoDAO.DeleteById(AId: Integer);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('delete from tb_contatos where id_contato=:id_contato ');
+      vQry.ParamByName('id_contato').AsInteger := AId;
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TContatoDAO.DeleteByIdCliente(AId: Integer);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('delete from tb_contatos where id_cliente=:id_cliente ');
+      vQry.ParamByName('id_cliente').AsInteger := AId;
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TContatoDAO.Update(AContatoModel: TModelContato);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('update tb_contatos set  nome       =:nome,       '+
+                   '                        data_nasc  =:data_nasc,  '+
+                   '                        idade      =:idade,      '+
+                   '                        telefone   =:telefone,   '+
+                   ' where id_contato=:id_contato and id_cliente =:id_cliente ');
+
+      vQry.ParamByName('id_contato').AsInteger := AContatoModel.id_contato;
+      vQry.ParamByName('nome').AsString        := AContatoModel.nome;
+      vQry.ParamByName('data_nasc').AsString   := AContatoModel.data_nasc;
+      vQry.ParamByName('idade').AsInteger      := AContatoModel.idade;
+      vQry.ParamByName('telefone').AsString    := AContatoModel.telefone;
+      vQry.ParamByName('id_cliente').AsInteger := AContatoModel.id_cliente;
+
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+end.

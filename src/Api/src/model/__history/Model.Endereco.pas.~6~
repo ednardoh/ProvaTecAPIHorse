@@ -1,0 +1,93 @@
+unit Model.Endereco;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections,
+  GBSwagger.Model.Attributes;
+
+type TModelEndereco = class
+  private
+    Fid         : integer;
+    Fcep        : string;
+    Flogradouro : string;
+    Fcomplemento: string;
+    Fbairro     : string;
+    Fcidade     : string;
+    Flocalidade : string;
+    Fuf         : string;
+
+    procedure Setid(const Value: integer);
+    procedure Setcep(const Value: string);
+    procedure Setlogradouro(const Value: string);
+    procedure Setcomplemento(const Value: string);
+    procedure Setbairro(const Value: string);
+    procedure Setcidade(const Value: string);
+    procedure Setlocalidade(const Value: string);
+    procedure Setuf(const Value: string);
+  public
+    [SwagProp('ID', True)]
+    property id:          integer read Fid          write Setid;
+    [SwagProp('CEP', False)]
+    property cep:         string  read Fcep         write Setcep;
+    [SwagProp('LOGRADOURO', False)]
+    property logradouro:  string  read Flogradouro  write Setlogradouro;
+    [SwagProp('COMPLEMENTO', False)]
+    property complemento: string  read Fcomplemento write Setcomplemento;
+    [SwagProp('BAIRRO', False)]
+    property bairro:      string  read Fbairro      write Setbairro;
+    [SwagProp('CIDADE', False)]
+    property cidade:      string  read Fcidade      write Setcidade;
+    [SwagProp('LOCALIDADE', False)]
+    property localidade:  string  read Flocalidade  write Setlocalidade;
+    [SwagProp('UF', False)]
+    property uf:          string  read Fuf          write Setuf;
+
+end;
+
+implementation
+
+{ TModelCliente }
+
+procedure TModelEndereco.Setid(const Value: integer);
+begin
+  Fid := Value;
+end;
+
+procedure TModelEndereco.Setcep(const Value: string);
+begin
+  Fcep := Value;
+end;
+
+procedure TModelEndereco.Setlogradouro(const Value: string);
+begin
+  Flogradouro := Value;
+end;
+
+procedure TModelEndereco.Setcomplemento(const Value: string);
+begin
+  Fcomplemento := Value;
+end;
+
+procedure TModelEndereco.Setbairro(const Value: string);
+begin
+  Fbairro := Value;
+end;
+
+procedure TModelEndereco.Setcidade(const Value: string);
+begin
+  Fcidade := Value;
+end;
+
+procedure TModelEndereco.Setlocalidade(const Value: string);
+begin
+  Flocalidade := Value;
+end;
+
+procedure TModelEndereco.Setuf(const Value: string);
+begin
+  Fuf := Value;
+end;
+
+end.

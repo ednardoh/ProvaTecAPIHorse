@@ -1,0 +1,278 @@
+unit DAO.Parcela;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections, Model.Parcela;
+
+type TParcelaDAO = class
+  private
+    FConexao: TConexao;
+  public
+    constructor Create;
+
+  function ListByIdCliente(AId: Integer) : TJSONArray;
+  function ListAll()                     : TJSONArray;
+  procedure Insert(AParcelaModel: TParcelaModel);
+  procedure Update(AParcelaModel: TParcelaModel);
+  procedure Delete(AId: Integer);
+
+end;
+
+implementation
+
+{ TParcelaDAO }
+
+constructor TParcelaDAO.Create;
+begin
+  FConexao := TControllersConexao.GetInstance().Conexao;
+end;
+
+procedure TParcelaDAO.Insert(AParcelaModel: TParcelaModel);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.ExecSQL('INSERT INTO tb_parcelas(            '+
+                   '            id_tipo_pgto,           '+
+                   '            id_credor,              '+
+                   '            id_cliente,             '+
+                   '            valor_total,            '+
+                   '            dt_primeira_parcela,    '+
+                   '            vl_primeira_parcela,    '+
+                   '            dt_segunda_parcela,     '+
+                   '            vl_segunda_parcela,     '+
+                   '            dt_terceira_parcela,    '+
+                   '            vl_terceira_parcela,    '+
+                   '            dt_quarta_parcela,      '+
+                   '            vl_quarta_parcela,      '+
+                   '            status)                 '+
+                   'VALUES (:id_tipo_pgto,              '+
+                   '        :id_credor,                 '+
+                   '        :id_cliente,                '+
+                   '        :valor_total,               '+
+                   '        :dt_primeira_parcela,       '+
+                   '        :vl_primeira_parcela,       '+
+                   '        :dt_segunda_parcela,        '+
+                   '        :vl_segunda_parcela,        '+
+                   '        :dt_terceira_parcela,       '+
+                   '        :vl_terceira_parcela,       '+
+                   '        :dt_quarta_parcela,         '+
+                   '        :vl_quarta_parcela,         '+
+                   '        :status)                    ',
+      [AParcelaModel.id_tipo_pgto,
+       AParcelaModel.id_credor,
+       AParcelaModel.id_cliente,
+       AParcelaModel.valor_total,
+       AParcelaModel.dt_primeira_parcela,
+       AParcelaModel.vl_primeira_parcela,
+       AParcelaModel.dt_segunda_parcela,
+       AParcelaModel.vl_segunda_parcela,
+       AParcelaModel.dt_terceira_parcela,
+       AParcelaModel.vl_terceira_parcela,
+       AParcelaModel.dt_quarta_parcela,
+       AParcelaModel.vl_quarta_parcela,
+       AParcelaModel.status]);
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TParcelaDAO.Update(AParcelaModel: TParcelaModel);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('UPDATE tb_parcelas                               '+
+                   '	SET id_tipo_pgto=:id_tipo_pgto,                '+
+                   '	    id_credor=:id_credor,                      '+
+                   '	  	id_cliente=:id_cliente,                    '+
+                   '	  	valor_total=:valor_total,                  '+
+                   '		  dt_primeira_parcela=:dt_primeira_parcela,  '+
+                   '		  vl_primeira_parcela=:vl_primeira_parcela,  '+
+                   '		  dt_segunda_parcela=:dt_segunda_parcela,    '+
+                   '		  vl_segunda_parcela=:vl_segunda_parcela,    '+
+                   '		  dt_terceira_parcela=:dt_terceira_parcela,  '+
+                   '		  vl_terceira_parcela=:vl_terceira_parcela,  '+
+                   '		  dt_quarta_parcela=:dt_quarta_parcela,      '+
+                   '		  vl_quarta_parcela=:vl_quarta_parcela,      '+
+                   '      status=:status                             '+
+                   '	WHERE id_parcelas=:id_parcelas                 ');
+
+      vQry.ParamByName('id_parcelas').AsInteger         := AParcelaModel.id_parcelas;
+      vQry.ParamByName('id_tipo_pgto').AsInteger        := AParcelaModel.id_tipo_pgto;
+      vQry.ParamByName('id_credor').AsInteger           := AParcelaModel.id_credor;
+      vQry.ParamByName('id_cliente').AsInteger          := AParcelaModel.id_cliente;
+      vQry.ParamByName('valor_total').AsString          := AParcelaModel.valor_total;
+      vQry.ParamByName('dt_primeira_parcela').AsString  := AParcelaModel.dt_primeira_parcela;
+      vQry.ParamByName('vl_primeira_parcela').AsString  := AParcelaModel.vl_primeira_parcela;
+      vQry.ParamByName('dt_segunda_parcela').AsString   := AParcelaModel.dt_primeira_parcela;
+      vQry.ParamByName('vl_segunda_parcela').AsString   := AParcelaModel.vl_segunda_parcela;
+      vQry.ParamByName('dt_terceira_parcela').AsString  := AParcelaModel.dt_terceira_parcela;
+      vQry.ParamByName('vl_terceira_parcela').AsString  := AParcelaModel.vl_terceira_parcela;
+      vQry.ParamByName('dt_quarta_parcela').AsString    := AParcelaModel.dt_quarta_parcela;
+      vQry.ParamByName('vl_quarta_parcela').AsString    := AParcelaModel.vl_quarta_parcela;
+      vQry.ParamByName('status').AsInteger              := AParcelaModel.status;
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TParcelaDAO.Delete(AId: Integer);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('delete from tb_parcelas where id_parcelas=:id_parcelas ');
+      vQry.ParamByName('id_parcelas').AsInteger := AId;
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TParcelaDAO.ListAll: TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('SELECT id_parcelas,          '+
+                 '       id_tipo_pgto,         '+
+                 '       id_credor,            '+
+                 '       id_cliente,           '+
+                 '       valor_total,          '+
+                 '       dt_primeira_parcela,  '+
+                 '       vl_primeira_parcela,  '+
+                 '       dt_segunda_parcela,   '+
+                 '       vl_segunda_parcela,   '+
+                 '       dt_terceira_parcela,  '+
+                 '       vl_terceira_parcela,  '+
+                 '       dt_quarta_parcela,    '+
+                 '       vl_quarta_parcela,    '+
+                 '       status                '+
+                 'FROM tb_parcelas             ');
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id_parcelas'        , TJSONNumber.Create(vQry.FieldByName('id_parcelas').AsInteger));
+        oJson.AddPair('id_tipo_pgto'       , TJSONNumber.Create(vQry.FieldByName('id_tipo_pgto').AsInteger));
+        oJson.AddPair('id_credor'          , TJSONNumber.Create(vQry.FieldByName('id_credor').AsInteger));
+        oJson.AddPair('id_cliente'         , TJSONNumber.Create(vQry.FieldByName('id_cliente').AsInteger));
+        oJson.AddPair('valor_total'        , TJSONNumber.Create(vQry.FieldByName('valor_total').AsString));
+        oJson.AddPair('dt_primeira_parcela', vQry.FieldByName('dt_primeira_parcela').AsString);
+        oJson.AddPair('vl_primeira_parcela', vQry.FieldByName('vl_primeira_parcela').AsString);
+        oJson.AddPair('dt_segunda_parcela' , vQry.FieldByName('dt_segunda_parcela').AsString);
+        oJson.AddPair('vl_segunda_parcela' , vQry.FieldByName('vl_segunda_parcela').AsString);
+        oJson.AddPair('dt_terceira_parcela', vQry.FieldByName('dt_terceira_parcela').AsString);
+        oJson.AddPair('vl_terceira_parcela', vQry.FieldByName('vl_terceira_parcela').AsString);
+        oJson.AddPair('dt_quarta_parcela'  , vQry.FieldByName('dt_quarta_parcela').AsString);
+        oJson.AddPair('vl_quarta_parcela'  , vQry.FieldByName('vl_quarta_parcela').AsString);
+        oJson.AddPair('status'             , TJSONNumber.Create(vQry.FieldByName('status').AsInteger));
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TParcelaDAO.ListByIdCliente(AId: Integer): TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('SELECT id_parcelas,             '+
+                 '       id_tipo_pgto,            '+
+                 '       id_credor,               '+
+                 '       id_cliente,              '+
+                 '       valor_total,             '+
+                 '       dt_primeira_parcela,     '+
+                 '       vl_primeira_parcela,     '+
+                 '       dt_segunda_parcela,      '+
+                 '       vl_segunda_parcela,      '+
+                 '       dt_terceira_parcela,     '+
+                 '       vl_terceira_parcela,     '+
+                 '       dt_quarta_parcela,       '+
+                 '       vl_quarta_parcela,       '+
+                 '       status                   '+
+                 'FROM tb_parcelas                '+
+                 ' where id_parcelas=:id_parcelas ');
+    vQry.ParamByName('id_parcelas').AsInteger := AId;
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id_parcelas'        , TJSONNumber.Create(vQry.FieldByName('id_parcelas').AsInteger));
+        oJson.AddPair('id_tipo_pgto'       , TJSONNumber.Create(vQry.FieldByName('id_tipo_pgto').AsInteger));
+        oJson.AddPair('id_credor'          , TJSONNumber.Create(vQry.FieldByName('id_credor').AsInteger));
+        oJson.AddPair('id_cliente'         , TJSONNumber.Create(vQry.FieldByName('id_cliente').AsInteger));
+        oJson.AddPair('valor_total'        , TJSONNumber.Create(vQry.FieldByName('valor_total').AsString));
+        oJson.AddPair('dt_primeira_parcela', vQry.FieldByName('dt_primeira_parcela').AsString);
+        oJson.AddPair('vl_primeira_parcela', TJSONNumber.Create(vQry.FieldByName('vl_primeira_parcela').AsString));
+        oJson.AddPair('dt_segunda_parcela' , vQry.FieldByName('dt_segunda_parcela').AsString);
+        oJson.AddPair('vl_segunda_parcela' , TJSONNumber.Create(vQry.FieldByName('vl_segunda_parcela').AsString));
+        oJson.AddPair('dt_terceira_parcela', vQry.FieldByName('dt_terceira_parcela').AsString);
+        oJson.AddPair('vl_terceira_parcela', TJSONNumber.Create(vQry.FieldByName('vl_terceira_parcela').AsString));
+        oJson.AddPair('dt_quarta_parcela'  , vQry.FieldByName('dt_quarta_parcela').AsString);
+        oJson.AddPair('vl_quarta_parcela'  , TJSONNumber.Create(vQry.FieldByName('vl_quarta_parcela').AsString));
+        oJson.AddPair('status'             , TJSONNumber.Create(vQry.FieldByName('status').AsInteger));
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+end.

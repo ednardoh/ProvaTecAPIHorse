@@ -1,0 +1,70 @@
+unit Controllers.Tipopgto;
+
+interface
+
+uses Horse, DataSet.Serialize, System.JSON, Data.DB,
+     DAO.Tipopgto, System.SysUtils;
+
+procedure Registry;
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+implementation
+
+Uses Model.Tipopgto;
+
+procedure ListAll(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOTipopgto: TTipopgtoDAO;
+  iId: Integer;
+begin
+  try
+    LDAOTipopgto := TTipopgtoDAO.Create;
+    Res.Send<TJSONArray>(LDAOTipopgto.ListAll());
+  finally
+    LDAOTipopgto.Free;
+  end;
+end;
+
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOTipopgto: TTipopgtoDAO;
+  iId: Integer;
+begin
+  try
+    LDAOTipopgto := TTipopgtoDAO.Create;
+    iId := StrToInt(Req.Params.Items['id']);
+    Res.Send<TJSONArray>(LDAOTipopgto.ListById(iId));
+  finally
+    LDAOTipopgto.Free;
+  end;
+end;
+
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+
+end;
+
+procedure Registry;
+begin
+  THorse.Get('/tipopgtoall', ListAll);
+  THorse.Get('/tipopgtobyid/:id', ListById);
+  THorse.Post('/tipopgtoinsert', Insert);
+  THorse.Put('/tipopgtoupdate', Update);
+  THorse.Delete('/tipopgtodelete/:id', Delete);
+end;
+
+
+end.

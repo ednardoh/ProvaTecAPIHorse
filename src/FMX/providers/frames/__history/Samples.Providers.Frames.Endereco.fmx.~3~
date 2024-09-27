@@ -1,0 +1,139 @@
+object EnderFrame: TEnderFrame
+  Size.Width = 438.000000000000000000
+  Size.Height = 90.000000000000000000
+  Size.PlatformDefault = False
+  object Rectangle1: TRectangle
+    Align = Client
+    Size.Width = 438.000000000000000000
+    Size.Height = 90.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Thickness = 0.000000000000000000
+    object Layout2: TLayout
+      Align = Client
+      Size.Width = 438.000000000000000000
+      Size.Height = 90.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object Label1: TLabel
+        StyledSettings = [Family, Size, FontColor]
+        Position.X = 8.000000000000000000
+        Position.Y = 24.000000000000000000
+        Size.Width = 74.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'Logradouro:'
+        TabOrder = 11
+      end
+      object Label2: TLabel
+        StyledSettings = [Family, Size, FontColor]
+        Position.X = 8.000000000000000000
+        Position.Y = 44.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'Bairro:'
+        TabOrder = 2
+      end
+      object lblLogradouro: TLabel
+        Anchors = [akLeft, akTop, akRight]
+        Position.X = 80.000000000000000000
+        Position.Y = 24.000000000000000000
+        Size.Width = 351.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 8
+      end
+      object lblBairro: TLabel
+        Anchors = [akLeft, akTop, akRight]
+        Position.X = 47.000000000000000000
+        Position.Y = 44.000000000000000000
+        Size.Width = 383.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 5
+      end
+      object Label3: TLabel
+        StyledSettings = [Family, Size, FontColor]
+        Position.X = 8.000000000000000000
+        Position.Y = 5.000000000000000000
+        Size.Width = 25.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'Id:'
+        TabOrder = 10
+      end
+      object lblID: TLabel
+        Anchors = [akLeft, akTop, akRight]
+        Position.X = 31.000000000000000000
+        Position.Y = 5.000000000000000000
+        Size.Width = 34.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 7
+      end
+      object Label4: TLabel
+        StyledSettings = [Family, Size, FontColor]
+        Position.X = 72.000000000000000000
+        Position.Y = 5.000000000000000000
+        Size.Width = 25.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'Cep:'
+        TabOrder = 9
+      end
+      object lblCep: TLabel
+        Anchors = [akLeft, akTop, akRight]
+        Position.X = 104.000000000000000000
+        Position.Y = 5.000000000000000000
+        Size.Width = 97.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 6
+      end
+      object Label5: TLabel
+        StyledSettings = [Family, Size, FontColor]
+        Position.X = 8.000000000000000000
+        Position.Y = 64.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'Cidade:'
+        TabOrder = 1
+      end
+      object lblCidade: TLabel
+        Anchors = [akLeft, akTop, akRight]
+        Position.X = 58.000000000000000000
+        Position.Y = 64.000000000000000000
+        Size.Width = 315.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+      end
+      object Label6: TLabel
+        StyledSettings = [Family, Size, FontColor]
+        Position.X = 388.000000000000000000
+        Position.Y = 64.000000000000000000
+        Size.Width = 22.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'UF:'
+        TabOrder = 0
+      end
+      object lblUF: TLabel
+        Anchors = [akLeft, akTop, akRight]
+        Position.X = 408.000000000000000000
+        Position.Y = 64.000000000000000000
+        Size.Width = 25.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+      end
+    end
+  end
+end

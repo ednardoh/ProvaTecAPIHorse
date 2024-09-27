@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2024/08/04 21:47:13.000.714,=C:\Users\ednar\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2024/08/04 21:47:47.000.269,E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\uTestCliente.pas=C:\Users\ednar\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2024/08/04 21:48:03.000.910,E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\TesteProvaTec.dproj=C:\Users\ednar\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2024/08/05 00:54:49.000.790,=E:\Sistemas\ProvaTecHorse\src\uCadCliente.pas</Transaction>
+    <Transaction>2024/08/05 01:50:22.000.646,E:\Sistemas\ProvaTecHorse\src\uCadCliente.pas=</Transaction>
+    <Transaction>2024/08/05 11:36:01.000.717,=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas</Transaction>
+    <Transaction>2024/08/05 11:38:49.000.449,=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas</Transaction>
+    <Transaction>2024/08/05 11:39:18.000.458,E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\uTestContato.pas</Transaction>
+    <Transaction>2024/08/05 13:27:42.000.985,=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas</Transaction>
+    <Transaction>2024/08/05 13:28:24.000.326,E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\uTestTipopgto.pas</Transaction>
+    <Transaction>2024/08/05 13:41:25.000.092,=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas</Transaction>
+    <Transaction>2024/08/05 13:42:10.000.043,E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\uTestCredores.pas</Transaction>
+    <Transaction>2024/08/05 13:58:33.000.154,=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas</Transaction>
+    <Transaction>2024/08/05 13:59:00.000.775,E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\Unit1.pas=E:\Sistemas\ProvaTecHorse\src\ProvaTecTeste\uTestParcelas.pas</Transaction>
+    <Transaction>2024/09/09 02:00:11.664,C:\Sistemas\ProvaTecToTvs\src\TesteUnitario\uTestEndereco.pas=C:\Sistemas\ProvaTecToTvs\src\TesteUnitario\uTestCliente.pas</Transaction>
+    <Transaction>2024/09/09 02:00:24.287,C:\Sistemas\ProvaTecToTvs\src\TesteUnitario\uTestContato.pas=</Transaction>
+    <Transaction>2024/09/09 02:00:27.539,C:\Sistemas\ProvaTecToTvs\src\TesteUnitario\uTestCredores.pas=</Transaction>
+    <Transaction>2024/09/09 02:00:31.276,C:\Sistemas\ProvaTecToTvs\src\TesteUnitario\uTestParcelas.pas=</Transaction>
+    <Transaction>2024/09/09 02:00:34.613,C:\Sistemas\ProvaTecToTvs\src\TesteUnitario\uTestTipopgto.pas=</Transaction>
+  </Transactions>
+</BorlandProject>

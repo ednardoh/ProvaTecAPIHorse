@@ -1,0 +1,290 @@
+unit DAO.Endereco;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections, Model.Endereco;
+
+type
+  TEnderecoDAO = class
+    private
+      FConexao: TConexao;
+    public
+      constructor Create;
+
+      function ListById(AId: Integer)          : TJSONArray;
+      function ListByLogradouro(ANome: string) : TJSONArray;
+      function ListAll()                       : TJSONArray;
+      function GetId: Integer;
+      procedure Insert(AEnderecoModel: TModelEndereco);
+      procedure Update(AEnderecoModel: TModelEndereco);
+      procedure Delete(AId: Integer);
+
+  end;
+
+implementation
+
+{ TClienteDAO }
+
+constructor TEnderecoDAO.Create;
+begin
+  FConexao := TControllersConexao.GetInstance().Conexao;
+end;
+
+procedure TEnderecoDAO.Insert(AEnderecoModel: TModelEndereco);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.ExecSQL('insert into TB_ENDERECO(id,           '+
+                   '                        cep,          '+
+                   '                        logradouro,   '+
+                   '                        complemento,  '+
+                   '                        bairro,       '+
+                   '                        cidade,       '+
+                   '                        localidade,   '+
+                   '                        uf)           '+
+                   'values (                              '+
+                   '                        :id,          '+
+                   '                        :cep,         '+
+                   '                        :logradouro,  '+
+                   '                        :complemento, '+
+                   '                        :bairro,      '+
+                   '                        :cidade,      '+
+                   '                        :localidade,  '+
+                   '                        :uf)          ',
+      [Getid,
+       AEnderecoModel.cep,
+       AEnderecoModel.logradouro,
+       AEnderecoModel.complemento,
+       AEnderecoModel.bairro,
+       AEnderecoModel.cidade,
+       AEnderecoModel.localidade,
+       AEnderecoModel.uf]);
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TEnderecoDAO.Update(AEnderecoModel: TModelEndereco);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('update TB_ENDERECO set  cep        =:cep,          '+
+                   '                        logradouro =:logradouro,   '+
+                   '                        complemento=:complemento,  '+
+                   '                        bairro     =:bairro,       '+
+                   '                        cidade     =:cidade,       '+
+                   '                        localidade =:localidade,   '+
+                   '                        uf         =:uf            '+
+                   ' where id=:id                                      ');
+
+      vQry.ParamByName('id').AsInteger         := AEnderecoModel.id;
+      vQry.ParamByName('cep').AsString         := AEnderecoModel.cep;
+      vQry.ParamByName('logradouro').AsString  := AEnderecoModel.logradouro;
+      vQry.ParamByName('complemento').AsString := AEnderecoModel.complemento;
+      vQry.ParamByName('bairro').AsString      := AEnderecoModel.bairro;
+      vQry.ParamByName('cidade').AsString      := AEnderecoModel.cidade;
+      vQry.ParamByName('localidade').AsString  := AEnderecoModel.localidade;
+      vQry.ParamByName('uf').AsString          := AEnderecoModel.uf;
+
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    VQry.Free;
+  end;
+end;
+
+procedure TEnderecoDAO.Delete(AId: Integer);
+var
+  vQry: TFDQuery;
+begin
+  try
+    vQry:= FConexao.CriarQuery();
+    try
+      vQry.Connection.StartTransaction;
+      vQry.close;
+      vQry.SQL.Clear;
+      vQry.SQL.Add('delete from TB_ENDERECO where id=:id ');
+      vQry.ParamByName('id').AsInteger := AId;
+      vQry.ExecSQL;
+      vQry.Connection.Commit;
+    except
+    on E: Exception do
+      begin
+        VQry.Connection.Rollback;  //desfaz a transação
+      end;
+    end;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TEnderecoDAO.GetId: Integer;
+var
+  vQry: TFDQuery;
+begin
+  vQry := FConexao.CriarQuery();
+  try
+    vQry.Open('SELECT coalesce(MAX(ID),0)+1 AS CODIGO FROM TB_ENDERECO');
+    try
+      Result := vQry.Fields[0].AsInteger;
+    finally
+      vQry.Close;
+    end;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TEnderecoDAO.ListById(AId: Integer): TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('select e.id,           ' +
+                 '       e.cep,          ' +
+                 '       e.logradouro,   ' +
+                 '       e.complemento,  ' +
+                 '       e.bairro,       ' +
+                 '       e.cidade,       ' +
+                 '       e.localidade,   ' +
+                 '       e.uf            ' +
+                 'from TB_ENDERECO e     ' +
+                 ' where e.id=:id        ');
+    vQry.ParamByName('id').AsInteger := AId;
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id'         , TJSONNumber.Create(vQry.FieldByName('id').AsInteger));
+        oJson.AddPair('cep'        , vQry.FieldByName('cep').AsString);
+        oJson.AddPair('logradouro' , vQry.FieldByName('logradouro').AsString);
+        oJson.AddPair('complemento', vQry.FieldByName('complemento').AsString);
+        oJson.AddPair('bairro'     , vQry.FieldByName('bairro').AsString);
+        oJson.AddPair('cidade'     , vQry.FieldByName('cidade').AsString);
+        oJson.AddPair('localidade' , vQry.FieldByName('localidade').AsString);
+        oJson.AddPair('uf'   , vQry.FieldByName('uf').AsString);
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TEnderecoDAO.ListByLogradouro(ANome: string): TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('select e.id,           ' +
+                 '       e.cep,          ' +
+                 '       e.logradouro,   ' +
+                 '       e.complemento,  ' +
+                 '       e.bairro,       ' +
+                 '       e.cidade,       ' +
+                 '       e.localidade,   ' +
+                 '       e.uf            ' +
+                 'from TB_ENDERECO e     ' +
+                 ' where e.logradouro Like %:logradouro% ');
+    vQry.ParamByName('logradouro').AsString := ANome;
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id'         , TJSONNumber.Create(vQry.FieldByName('id').AsInteger));
+        oJson.AddPair('cep'        , vQry.FieldByName('cep').AsString);
+        oJson.AddPair('logradouro' , vQry.FieldByName('logradouro').AsString);
+        oJson.AddPair('complemento', vQry.FieldByName('complemento').AsString);
+        oJson.AddPair('bairro'     , vQry.FieldByName('bairro').AsString);
+        oJson.AddPair('cidade'     , vQry.FieldByName('cidade').AsString);
+        oJson.AddPair('localidade' , vQry.FieldByName('localidade').AsString);
+        oJson.AddPair('uf'   , vQry.FieldByName('uf').AsString);
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+function TEnderecoDAO.ListAll: TJSONArray;
+var
+  vQry: TFDQuery;
+  aJson: TJSONArray;
+  oJson: TJSONObject;
+begin
+  vQry:= FConexao.CriarQuery();
+  aJson := TJSONArray.Create;
+  try
+    vQry.close;
+    vQry.SQL.Clear;
+    vQry.SQL.Add('select e.id,           ' +
+                 '       e.cep,          ' +
+                 '       e.logradouro,   ' +
+                 '       e.complemento,  ' +
+                 '       e.bairro,       ' +
+                 '       e.cidade,       ' +
+                 '       e.localidade,   ' +
+                 '       e.uf            ' +
+                 'from TB_ENDERECO e     ');
+    vQry.Open;
+    while not vQry.Eof do
+      begin
+        oJson := TJSONObject.Create;
+        oJson.AddPair('id'         , TJSONNumber.Create(vQry.FieldByName('id').AsInteger));
+        oJson.AddPair('cep'        , vQry.FieldByName('cep').AsString);
+        oJson.AddPair('logradouro' , vQry.FieldByName('logradouro').AsString);
+        oJson.AddPair('complemento', vQry.FieldByName('complemento').AsString);
+        oJson.AddPair('bairro'     , vQry.FieldByName('bairro').AsString);
+        oJson.AddPair('cidade'     , vQry.FieldByName('cidade').AsString);
+        oJson.AddPair('localidade' , vQry.FieldByName('localidade').AsString);
+        oJson.AddPair('uf'         , vQry.FieldByName('uf').AsString);
+        aJson.AddElement(oJson);
+        vQry.Next;
+      end;
+      Result:=aJson;
+  finally
+    vQry.Free;
+  end;
+end;
+
+end.

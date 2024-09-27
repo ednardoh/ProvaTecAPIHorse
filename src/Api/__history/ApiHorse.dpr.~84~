@@ -1,0 +1,107 @@
+program ApiHorse;
+
+{$APPTYPE CONSOLE}
+
+{$R *.res}
+
+uses
+  Horse,
+  Horse.Jhonson,
+  Horse.HandleException,
+  Horse.GBSwagger,
+  System.SysUtils,
+  Winapi.ShellAPI,
+  Winapi.Windows,
+  System.Variants,
+  Vcl.Controls,
+  Vcl.Forms,
+  DAO.Endereco in 'src\dao\DAO.Endereco.pas',
+  UConecta in 'src\conexao\UConecta.pas',
+  Controllers.Endereco in 'src\controllers\Controllers.Endereco.pas',
+  Model.Endereco in 'src\model\Model.Endereco.pas',
+  uConexao in 'src\conexao\uConexao.pas',
+  Controllers.Conexao in 'src\controllers\Controllers.Conexao.pas';
+begin
+  THorse
+    .Use(Jhonson)
+    .Use(HandleException);
+  THorse
+    .Use(HorseSwagger(Format('%s/swagger/doc/html', ['v1']),Format('%s/swagger/doc/json', ['v1'])));
+
+  Controllers.Endereco.Registry;
+
+  Swagger
+    .Info
+      .Title('API Horse prova Tecnica')
+      .Description('Documentação da API Cadastro de Endereços.')
+      .Contact
+        .Name('José Ednardo S. Honorato')
+        .Email('ednardoh@gmail.com')
+        .URL('')
+      .&End
+    .&End
+    .BasePath('v1')
+    .Path('endereco')
+      .Tag('Endereços')
+      .GET('Listar todos os endereços')
+        .AddResponse(200, 'Lista de Endereços').Schema(TModelEndereco).IsArray(True).&End
+      .&End
+      .POST('Criar um novo Endereço')
+        .AddParamBody('Dados do Endereço').Required(True).Schema(TModelEndereco).&End
+        .AddResponse(201).Schema(TModelEndereco).&End
+        .AddResponse(400).&End
+      .&End
+    .&End
+    .Path('endereco/{nome}')
+      .Tag('Endereços')
+      .GET('Obter os dados de um Endereço específico')
+        .AddParamPath('logradouro', 'LOGRADOURO').&End
+        .AddResponse(200, 'Dados do Endereço').Schema(TModelEndereco).&End
+        .AddResponse(404).&End
+      .&End
+    .&End
+    .Path('endereco/{id}')
+      .Tag('Endereços')
+      .GET('Obter os dados de um Endereço específico')
+        .AddParamPath('id', 'ID').&End
+        .AddResponse(200, 'Dados do Endereço').Schema(TModelEndereco).&End
+        .AddResponse(404).&End
+      .&End
+      .PUT('Alterar os dados de um Endereço específico')
+        .AddParamPath('id', 'ID').&End
+        .AddParamBody('Dados do Endereço').Required(True).Schema(TModelEndereco).&End
+        .AddResponse(204).&End
+        .AddResponse(400).&End
+        .AddResponse(404).&End
+      .&End
+      .DELETE('Excluir Endereço')
+        .AddParamPath('id', 'ID').&End
+        .AddResponse(204).&End
+        .AddResponse(400).&End
+        .AddResponse(404).&End
+      .&End
+    .&End
+  .&End;
+
+
+  THorse.Listen(9000, procedure(App: THorse)
+  begin
+    Writeln('********************************************************');
+    Writeln('*                                                      *');
+    Writeln('*                                                      *');
+    Writeln('*   O servidor está rodando na porta: '+App.Port.ToString+'             *');
+    Writeln('*                                                      *');
+    Writeln('*                                                      *');
+    Writeln('********************************************************');
+
+    ShellExecute(Application.Handle,
+                'open',
+                'http://localhost:9000/v1/swagger/doc/html',
+                nil,
+                nil,
+                SW_SHOWMAXIMIZED);
+
+  end);
+
+
+end.

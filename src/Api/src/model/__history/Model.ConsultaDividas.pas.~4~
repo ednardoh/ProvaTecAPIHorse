@@ -1,0 +1,64 @@
+unit Model.ConsultaDividas;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections;
+
+type TModelConsultaDividas = class
+  private
+    Fcpf                     : string;
+    Fnomecliente             : string;
+    Fcpf_cnpj                : string;
+    Frazaosocialcredor       : string;
+    Ftipopgto                : string;
+    Fvalor_total             : string;
+    Fdt_primeira_parcela     : string;
+    Fqdiaspriparc            : integer;
+    Fstatuspriparc           : string;
+    Fvl_primeira_parcela     : string;
+    Fdt_segunda_parcela      : string;
+    Fqdiassegparc            : integer;
+    Fstatussegparc           : string;
+    Fvl_segunda_parcela      : string;
+    Fdt_terceira_parcela     : string;
+    Fqdiasterparc            : integer;
+    Fstatusterparc           : string;
+    Fvl_terceira_parcela     : string;
+    Fdt_quarta_parcela       : string;
+    Fqdiasquaparc            : integer;
+    Fstatusquaparc           : string;
+    Fvl_quarta_parcela       : string;
+
+    procedure Setcpf(const Value: string);
+    procedure Setnomecliente(const Value: string);
+    procedure Setcpf_cnpj(const Value: string);
+    procedure Setrazaosocialcredor(const Value: string);
+    procedure Settipopgto(const Value: string);
+    procedure Setvalor_total(const Value: string);
+    procedure Setdt_primeira_parcela(const Value: string);
+    procedure Setqdiaspriparc(const Value: integer);
+    procedure Setstatuspriparc(const Value: string);
+    procedure Setvl_primeira_parcela(const Value: string);
+    procedure Setdt_segunda_parcela(const Value: string);
+    procedure Setqdiassegparc(const Value: integer);
+    procedure Setstatussegparc(const Value: string);
+    procedure Setvl_segunda_parcela(const Value: string);
+    procedure Setdt_terceira_parcela(const Value: string);
+    procedure Setqdiasterparc(const Value: integer);
+    procedure Setstatusterparc(const Value: string);
+    procedure Setvl_terceira_parcela(const Value: string);
+    procedure Setdt_quarta_parcela(const Value: string);
+    procedure Setqdiasquaparc(const Value: integer);
+    procedure Setstatusquaparc(const Value: string);
+    procedure Setvl_quarta_parcela(const Value: string);
+
+  public
+
+
+end;
+
+implementation
+
+end.

@@ -1,0 +1,70 @@
+{
+	"hash": "d41d8cd98f00b204e9800998ecf8427e",
+	"updated": "2020-11-17T21:48:02.5078529-03:00",
+	"installedModules": {
+		"github.com/gabrielbaltazar/gbswagger": {
+			"name": "gbswagger",
+			"version": "3.0.7",
+			"hash": "c0e4dbb5f5f8d5bf1bae8fcd5cca48d4",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"github.com/hashload/handle-exception": {
+			"name": "handle-exception",
+			"version": "0.1.4",
+			"hash": "1152772d75f59dbb562cc7b7711a8ebe",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"github.com/hashload/horse": {
+			"name": "horse",
+			"version": "v2.0.6",
+			"hash": "cca1769dfab681cfd26ae8499f9045e1",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"github.com/hashload/jhonson": {
+			"name": "jhonson",
+			"version": "1.0.7",
+			"hash": "e0a2cfad431f565769ebe2815299924b",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"github.com/viniciussanchez/dataset-serialize": {
+			"name": "dataset-serialize",
+			"version": "v2.2.1",
+			"hash": "7d7b64e27f7fbed029362b73f5bf21a4",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/hashload/handle-exception": {
+			"name": "handle-exception",
+			"version": "0.1.4",
+			"hash": "1152772d75f59dbb562cc7b7711a8ebe",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/hashload/jhonson": {
+			"name": "jhonson",
+			"version": "1.1.1",
+			"hash": "5740da7df1068b882117a68df8098c9a",
+			"artifacts": {},
+			"failed": false,
+			"changed": true
+		},
+		"https://github.com/viniciussanchez/dataset-serialize": {
+			"name": "dataset-serialize",
+			"version": "v2.3.1",
+			"hash": "7d7b64e27f7fbed029362b73f5bf21a4",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		}
+	}
+}

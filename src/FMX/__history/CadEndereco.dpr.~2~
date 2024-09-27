@@ -1,0 +1,14 @@
+program CadEndereco;
+
+uses
+  System.StartUpCopy,
+  FMX.Forms,
+  uCadEndereco in 'uCadEndereco.pas' {frmCadEndereco};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TfrmCadEndereco, frmCadEndereco);
+  Application.Run;
+end.

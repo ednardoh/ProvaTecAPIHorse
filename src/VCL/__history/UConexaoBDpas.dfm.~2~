@@ -1,0 +1,270 @@
+object frmConectaDB: TfrmConectaDB
+  Left = 0
+  Top = 0
+  Caption = 'Configura'#231#227'o do Banco'
+  ClientHeight = 332
+  ClientWidth = 644
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pn_Bottom: TPanel
+    Left = 0
+    Top = 282
+    Width = 644
+    Height = 50
+    Align = alBottom
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 0
+    object btn_Testaconexao: TButton
+      Left = 24
+      Top = 6
+      Width = 193
+      Height = 33
+      Caption = 'Testar Conex'#227'o com Banco'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      OnClick = btn_TestaconexaoClick
+    end
+    object btnConectar: TButton
+      Left = 223
+      Top = 6
+      Width = 122
+      Height = 33
+      Caption = 'Conectar'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 1
+      OnClick = btn_TestaconexaoClick
+    end
+    object btnFechar: TButton
+      Left = 512
+      Top = 6
+      Width = 113
+      Height = 33
+      Caption = 'Fechar'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 2
+      OnClick = btnFecharClick
+    end
+    object btn_GravaINI: TButton
+      Left = 351
+      Top = 6
+      Width = 145
+      Height = 33
+      Caption = 'Grava Configura'#231#227'o'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 3
+      OnClick = btn_GravaINIClick
+    end
+  end
+  object pn_Client: TPanel
+    Left = 0
+    Top = 0
+    Width = 644
+    Height = 282
+    Align = alClient
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 1
+    object Label1: TLabel
+      Left = 56
+      Top = 22
+      Width = 56
+      Height = 13
+      Caption = 'HostName :'
+    end
+    object Label2: TLabel
+      Left = 56
+      Top = 63
+      Width = 33
+      Height = 13
+      Caption = 'Porta :'
+    end
+    object Label3: TLabel
+      Left = 56
+      Top = 188
+      Width = 84
+      Height = 13
+      Caption = 'Senha do Banco :'
+    end
+    object Label4: TLabel
+      Left = 56
+      Top = 105
+      Width = 56
+      Height = 13
+      Caption = 'Data Base :'
+    end
+    object Label5: TLabel
+      Left = 56
+      Top = 145
+      Width = 90
+      Height = 13
+      Caption = 'Usu'#225'rio do Banco :'
+    end
+    object lblConexao: TLabel
+      Left = 1
+      Top = 242
+      Width = 642
+      Height = 39
+      Align = alBottom
+      Alignment = taCenter
+      Caption = 'Banco desconectado...'
+      Color = clBtnFace
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -32
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold, fsItalic]
+      ParentColor = False
+      ParentFont = False
+      ExplicitWidth = 357
+    end
+    object Edt_Host: TEdit
+      Left = 56
+      Top = 38
+      Width = 177
+      Height = 21
+      TabOrder = 0
+      OnEnter = Edt_HostEnter
+      OnExit = Edt_HostExit
+      OnKeyPress = Edt_HostKeyPress
+    end
+    object edt_Porta: TEdit
+      Left = 56
+      Top = 79
+      Width = 89
+      Height = 21
+      TabOrder = 1
+      Text = '0'
+      OnEnter = Edt_HostEnter
+      OnExit = Edt_HostExit
+      OnKeyPress = Edt_HostKeyPress
+    end
+    object Edt_Senha: TEdit
+      Left = 56
+      Top = 204
+      Width = 177
+      Height = 21
+      PasswordChar = '*'
+      TabOrder = 4
+      OnEnter = Edt_HostEnter
+      OnExit = Edt_HostExit
+      OnKeyPress = Edt_HostKeyPress
+    end
+    object edt_DataBase: TEdit
+      Left = 56
+      Top = 121
+      Width = 489
+      Height = 21
+      TabOrder = 2
+      OnEnter = Edt_HostEnter
+      OnExit = Edt_HostExit
+      OnKeyPress = Edt_HostKeyPress
+    end
+    object edt_Usuario: TEdit
+      Left = 56
+      Top = 161
+      Width = 177
+      Height = 21
+      TabOrder = 3
+      OnEnter = Edt_HostEnter
+      OnExit = Edt_HostExit
+      OnKeyPress = Edt_HostKeyPress
+    end
+    object btn_Openbanco: TBitBtn
+      Left = 552
+      Top = 119
+      Width = 33
+      Height = 25
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00000000000000000000000000000000000000000000000000001031668E1B54
+        AFF21B54AFF21B54AFF21B54AFF21B54AFF21B54AFF21B54AFF21B54AFF21B54
+        AFF21B54AFF21B54AFF21B54AFF21B54AFF21B54AFF21031668E1C55B0F263C5
+        F6FF23AEF3FF23AEF3FF23AEF3FF23AEF3FF23AEF3FF23AEF3FF23AEF3FF23AE
+        F3FF23AEF3FF23AEF3FF23AEF3FF23AEF3FF63C5F6FF1C55B0F21D58B1F25EC5
+        F6FF0FA8F2FF0FA8F2FF0FA8F2FF0FA8F2FF0FA8F2FF0FA8F2FF0FA8F2FF0FA8
+        F2FF0FA8F2FF0FA8F2FF0FA8F2FF0FA8F2FF5EC5F6FF1D58B1F21E5CB3F272CE
+        F8FF1DAFF3FF1DAFF3FF1DAFF3FF1DAFF3FF1DAFF3FF1DAFF3FF1DAFF3FF1DAF
+        F3FF1DAFF3FF1DAFF3FF1DAFF3FF1DAFF3FF72CEF8FF1E5CB3F22160B5F286D7
+        F9FF2EB8F4FF2EB8F4FF2EB8F4FF2EB8F4FF2EB8F4FF2EB8F4FF2EB8F4FF2EB8
+        F4FF2EB8F4FF2EB8F4FF2EB8F4FF2EB8F4FF86D7F9FF2160B5F22365B8F298DE
+        FAFF3FC1F5FF3FC1F5FF3FC1F5FF3FC1F5FF3FC1F5FF3FC1F5FF3FC1F5FF3FC1
+        F5FF3FC1F5FF3FC1F5FF3FC1F5FF3FC1F5FF98DEFAFF2365B8F22569BAF2AAE7
+        FBFF5CD0F7FF5CD0F7FF5CD0F7FF5CD0F7FF5CD0F7FF5CD0F7FF5CD0F7FF5CD0
+        F7FF5CD0F7FF5CD0F7FF5CD0F7FF5CD0F7FFAAE7FBFF2569BAF2286EBDF2B4EB
+        FCFFB4EBFCFFB4EBFCFFB4EBFCFFB4EBFCFFB4EBFCFFB4EBFCFFB4EBFCFFB4EB
+        FCFFB4EBFCFFB4EBFCFFB4EBFCFFB4EBFCFFB4EBFCFF286EBDF23075BFF341A4
+        E5FF2299E3FF2299E3FF2299E3FF2299E3FF2299E3FF2299E3FF2299E3FF2299
+        E3FF2299E3FF2299E3FF2299E3FF2299E3FF42A5E5FF2A72C0F2337EC5F34FC4
+        F6FF2AB6F4FF2AB6F4FF2AB6F4FF2AB6F4FF2FB8F4FF3EBEF5FF4DC3F6FF52C5
+        F6FF52C5F6FF52C5F6FF52C5F6FF52C5F6FF6FCFF7FF2C77C2F23884C9F359CB
+        F6FF43C3F5FF43C3F5FF43C3F5FF46C4F5FF55CAF6FF77D1F8FFB2E2FBFFC0E8
+        FBFFC0E8FBFFC0E8FBFFC0E8FBFFC0E8FBFFD0EEFCFF2E7BC4F23C8ACDF469D4
+        F8FF62D2F8FF62D2F8FF62D2F8FF65D3F8FF7FD5F9FF7CB3E0F8307FC6F2307F
+        C6F2307FC6F2307FC6F2307FC6F2307FC6F2307FC6F21C4B748E3D8ACCF3CFED
+        FCFFC0E8FBFFC0E8FBFFC0E8FBFFC9EBFCFF81B7E1F81D4D758E03080C0E0000
+        00000000000000000000000000000000000000000000000000001E4F778E3386
+        CAF23386CAF23386CAF23386CAF23386CAF21E4F778E0206090B000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000}
+      TabOrder = 5
+      Visible = False
+      OnClick = btn_OpenbancoClick
+    end
+  end
+  object ODG_Abrebanco: TOpenDialog
+    Filter = '(*.fdb)|*.fdb'
+    Left = 560
+    Top = 8
+  end
+  object DBConect: TFDConnection
+    Params.Strings = (
+      'Database=C:\Sistemas\ProvaTecToTvs\DADOS\ENDERECOS.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'Server=localhost'
+      'DriverID=FB')
+    LoginPrompt = False
+    Left = 520
+    Top = 64
+  end
+  object FDPhysFBDriverLink1: TFDPhysFBDriverLink
+    Left = 440
+    Top = 8
+  end
+end

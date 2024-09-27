@@ -1,0 +1,16 @@
+unit Controllers.Tipopgto;
+
+interface
+
+uses Horse, DataSet.Serialize, System.JSON, Data.DB,
+     DAO.Tipopgto, System.SysUtils;
+
+procedure Registry;
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+implementation
+
+end.

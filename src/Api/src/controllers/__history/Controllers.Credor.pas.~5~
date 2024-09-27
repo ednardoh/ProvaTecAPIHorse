@@ -1,0 +1,150 @@
+unit Controllers.Credor;
+
+interface
+
+uses Horse, DataSet.Serialize, System.JSON, Data.DB,
+     DAO.Contato, System.SysUtils;
+
+procedure Registry;
+procedure ListByNome(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure ListAll(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+implementation
+
+Uses Model.Credor;
+
+//Lista de clientes
+procedure ListByNome(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOCredores: TCredorDAO;
+  strNome: string;
+begin
+  try
+    LDAOCredores := TCredorDAO.Create;
+    strNome := Req.Params.Items['Nome'];
+    Res.Send<TJSONArray>(LDAOCredores.ListByNome(strNome));
+  finally
+    LDAOCredores.Free;
+  end;
+end;
+
+procedure ListById(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOCredores: TCredorDAO;
+  iId: Integer;
+begin
+  try
+    LDAOCredores := TCredorDAO.Create;
+    iId := StrToInt(Req.Params.Items['id']);
+    Res.Send<TJSONArray>(LDAOCredores.ListById(iId));
+  finally
+    LDAOCredores.Free;
+  end;
+end;
+
+procedure ListAll(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOCredores: TCredorDAO;
+begin
+  try
+    LDAOCredores := TCredorDAO.Create;
+    Res.Send<TJSONArray>(LDAOCredores.ListAll);
+  finally
+    LDAOCredores.Free;
+  end;
+end;
+
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOCredores: TCredorDAO;
+  oJson: TJSONObject;
+  CredorModel: TModelCredor;
+begin
+  try
+    if Req.Body.IsEmpty then
+      raise Exception.Create('Dados do Credor não encontrado.');
+    LDAOCredores := TCredorDAO.Create;
+    CredorModel := TModelCredor.Create;
+    oJson := Req.Body<TJSONObject>;
+    CredorModel.id          := 0;
+    CredorModel.cpfcnpj     := oJson.GetValue<string>('cpfcnpj');
+    CredorModel.nome        := oJson.GetValue<string>('nome');
+    CredorModel.cep         := oJson.GetValue<string>('cep');
+    CredorModel.logradouro  := oJson.GetValue<string>('logradouro');
+    CredorModel.numero      := oJson.GetValue<string>('numero');
+    CredorModel.complemento := oJson.GetValue<string>('complemento');
+    CredorModel.bairro      := oJson.GetValue<string>('bairro');
+    CredorModel.cidade      := oJson.GetValue<string>('cidade');
+    CredorModel.ibge_cidade := oJson.GetValue<string>('ibge_cidade');
+    CredorModel.sigla_uf    := oJson.GetValue<string>('sigla_uf');
+    LDAOCredores.Insert(CredorModel);
+    Res.Send<TJSONObject>(oJson).Status(THTTPStatus.Created);
+  finally
+    LDAOCredores.Free;
+    CredorModel.Free;
+  end;
+end;
+
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOCredores: TCredorDAO;
+  oJson: TJSONObject;
+  CredorModel: TModelCredor;
+begin
+  try
+    if Req.Body.IsEmpty then
+      raise Exception.Create('Dados do Credor não encontrado.');
+    LDAOCredores := TCredorDAO.Create;
+    CredorModel := TModelCredor.Create;
+    oJson := Req.Body<TJSONObject>;
+    CredorModel.id          := oJson.GetValue<Integer>('id');
+    CredorModel.cpfcnpj     := oJson.GetValue<string>('cpfcnpj');
+    CredorModel.nome        := oJson.GetValue<string>('nome');
+    CredorModel.cep         := oJson.GetValue<string>('cep');
+    CredorModel.logradouro  := oJson.GetValue<string>('logradouro');
+    CredorModel.numero      := oJson.GetValue<string>('numero');
+    CredorModel.complemento := oJson.GetValue<string>('complemento');
+    CredorModel.bairro      := oJson.GetValue<string>('bairro');
+    CredorModel.cidade      := oJson.GetValue<string>('cidade');
+    CredorModel.ibge_cidade := oJson.GetValue<string>('ibge_cidade');
+    CredorModel.sigla_uf    := oJson.GetValue<string>('sigla_uf');
+    LDAOCredores.Update(CredorModel);
+    Res.Send<TJSONObject>(oJson).Status(THTTPStatus.OK);
+  finally
+    LDAOCredores.Free;
+    ClienteModel.Free;
+  end;
+end;
+
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOCredores: TCredorDAO;
+  iId: Integer;
+begin
+  if Req.Params.Count = 0 then
+    raise Exception.Create('id não encontrado.');
+  try
+    LDAOCredores := TCredorDAO.Create;
+    iId := StrToInt(Req.Params.Items['id']);
+    LDAOCredores.Delete(iId);
+    Res.Send<TJSONObject>(TJSONObject.Create.AddPair('message', 'Credor deletado com sucesso.'));
+  finally
+    LDAOCredores.Free;
+  end;
+end;
+
+procedure Registry;
+begin
+  THorse.Get('/credoresbynome/:Nome', ListByNome);  //Lista de Clientes
+  THorse.Get('/credoresbyid/:id'    , ListById);
+  THorse.Get('/credoresall'         , ListAll);
+  THorse.Post('/credorinsert'       , Insert);
+  THorse.Put('/credorupdate'        , Update);
+  THorse.Delete('/credordelete/:id' , Delete);
+end;
+
+end.

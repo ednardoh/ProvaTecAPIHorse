@@ -1,0 +1,19 @@
+unit Model.Contato;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections;
+
+type TModelContato = class
+  private
+
+  public
+
+
+end;
+
+implementation
+
+end.

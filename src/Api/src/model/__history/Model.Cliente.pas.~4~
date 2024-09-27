@@ -1,0 +1,30 @@
+unit Model.Cliente;
+
+interface
+
+uses
+  FireDAC.Comp.Client, uConexao, System.SysUtils, System.JSON,
+  Controllers.Conexao, System.Generics.Collections;
+
+type TModelCliente = class
+  private
+    Fid: integer;
+    Fcpf: string;
+    Fnome: string;
+    Fcep: string;
+    Flogradouro: string;
+    Fnumero: string;
+    Fcomplemento: string;
+    Fbairro: string;
+    Fcidade: string;
+    Fibge_cidade: string;
+    Fsigla_uf: string;
+
+  public
+
+
+end;
+
+implementation
+
+end.

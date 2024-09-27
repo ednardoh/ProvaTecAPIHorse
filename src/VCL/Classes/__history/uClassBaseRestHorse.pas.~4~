@@ -1,0 +1,162 @@
+//Classe base com as configurações do Rest
+unit uClassBaseRestHorse;
+
+interface
+
+uses
+   REST.Client,
+   REST.Authenticator.Basic,
+   IPPeerClient,
+   REST.Types,
+   System.Classes,
+   System.SysUtils;
+type
+
+TClasseRest = class
+private
+    FCliente: TRESTClient;
+    FRequeste: TRESTRequest;
+    FResponse: TRESTResponse;
+    FAutenticar: THTTPBasicAuthenticator;
+    FBaseUrl: string;
+    FMetodo: TRESTRequestMethod;
+    FExecName: string;
+    FUsuarioId: string;
+    FContID: integer;
+    FMensagemAcao: string;
+    FPassWord: string;
+    FUserName: string;
+    FResource: string;
+  { private declarations }
+public
+  { public declarations }
+
+  property Cliente: TRESTClient read FCliente write FCliente;
+  property Requeste: TRESTRequest read FRequeste write FRequeste;
+  property Response: TRESTResponse read FResponse write FResponse;
+  property Autenticar: THTTPBasicAuthenticator read FAutenticar write FAutenticar;
+  property BaseUrl: string read FBaseUrl write FBaseUrl;
+  property Metodo: TRESTRequestMethod read FMetodo write FMetodo;
+  property ExecName: string read FExecName write FExecName;
+  property UserName: string read FUserName write FUserName;
+  property PassWord: string read FPassWord write FPassWord;
+  property MensagemAcao: string read FMensagemAcao write FMensagemAcao;
+  property ContID: integer read FContID write FContID;
+  property UsuarioId: string read FUsuarioId write FUsuarioId;
+  property Resource: string read FResource write FResource;
+
+  constructor create; virtual;
+  destructor Destroy; override;
+
+  procedure ConfigurarAmbiente; virtual;
+  procedure prIncluiAcionamento; virtual;
+  procedure getAcaoId; virtual;
+
+  procedure prGravarJson(stNomeArquivo, stDestino, stJson: string); virtual;
+  procedure prGravarXML(stNomeArquivo, stDestino, stJson: string); virtual;
+
+end;
+
+implementation
+
+{ TClasseRest }
+
+procedure TClasseRest.ConfigurarAmbiente;
+begin
+  with FCliente do
+  begin
+    Accept        := 'application/json, text/plain; q=0.9, text/html;q=0.8,';
+    AcceptCharset := 'UTF-8, *;q=0.8';
+    BaseURL       := FBaseUrl;
+    ContentType   := 'application/json';
+  end;
+
+  with FRequeste do
+  begin
+    Accept   := 'application/json, text/plain; q=0.9, text/html;q=0.8,';
+    Client   := FCliente;
+    Method   := FMetodo;
+    Response := FResponse;
+    Timeout  := 100000;
+  end;
+
+end;
+
+constructor TClasseRest.create;
+begin
+  FCliente    := TRESTClient.Create(nil);
+  FRequeste   := TRESTRequest.Create(nil);
+  FResponse   := TRESTResponse.Create(nil);
+  FAutenticar := THTTPBasicAuthenticator.Create(nil);
+end;
+
+
+destructor TClasseRest.Destroy;
+begin
+  FCliente.Free;
+  FRequeste.Free;
+  FResponse.Free;
+  FAutenticar.Free;
+  inherited;
+end;
+
+procedure TClasseRest.prGravarJson(stNomeArquivo, stDestino, stJson: string);
+var
+ JsonArquivo: TStringList;
+begin
+  if Length(stJson) > 0 then
+  begin
+    try
+      JsonArquivo := TStringList.Create;
+      JsonArquivo.Add(stJson);
+      if not DirectoryExists(FExecName+'Json') then
+         ForceDirectories(FExecName+'Json');
+
+      JsonArquivo.SaveToFile(FExecName+'Json\'+stNomeArquivo + FormatDateTime('ddmmyyyy',Date)+'_'+FormatDateTime('hhmmss',Time)+'.json');
+    finally
+      JsonArquivo.Free;
+    end;
+  end;
+end;
+
+procedure TClasseRest.prGravarXML(stNomeArquivo, stDestino, stJson: string);
+var
+ Xml: TStringList;
+begin
+  if Length(stJson) > 0 then
+  begin
+    try
+      Xml := TStringList.Create;
+      Xml.Add(stJson);
+      if not DirectoryExists(FExecName+'WS') then
+         ForceDirectories(FExecName+'WS');
+
+      Xml.SaveToFile(FExecName+'WS\'+stNomeArquivo + FormatDateTime('ddmmyyyy',Date)+'_'+FormatDateTime('hhmmss',Time)+'.XML');
+    finally
+      Xml.Free;
+    end;
+  end;
+end;
+
+procedure TClasseRest.prIncluiAcionamento;
+begin
+  getAcaoId;
+  with FEntityDevedorAcionamento.tbDevedor_Acionamento do
+  begin
+      DATA             := fmxRots.fcDataAtua;
+      ACAO_ID          := FAcaoID;
+      MENSAGEM         := FMensagemAcao;
+      FONE             := AcaoFone;
+      DEVEDOR_ID       := FDevedorId;
+      COBRADOR_ID      := FCobradorId;
+      USUARIO_INCLUSAO := FUsuarioId;
+      CONT_ID          := FContId;
+      ASSESSORIA_ID    := FAssessoriaId;
+      SE_SMS           := false;
+
+      EntityDevedorAcionamento.Insert;
+  end;
+
+end;
+
+end.

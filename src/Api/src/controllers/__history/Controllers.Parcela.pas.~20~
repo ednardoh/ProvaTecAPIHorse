@@ -1,0 +1,140 @@
+unit Controllers.Parcela;
+
+interface
+
+uses Horse, DataSet.Serialize, System.JSON, Data.DB,
+     DAO.Parcela, System.SysUtils;
+
+procedure Registry;
+procedure ListByIdCliente(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure ListAll(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+implementation
+
+Uses Model.Parcela;
+
+procedure ListByIdCliente(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOParcelas: TParcelaDAO;
+  iId: Integer;
+begin
+  try
+    LDAOParcelas := TParcelaDAO.Create;
+    iId := StrToInt(Req.Params.Items['id']);
+    Res.Send<TJSONArray>(LDAOParcelas.ListByIdCliente(iId));
+  finally
+    LDAOParcelas.Free;
+  end;
+end;
+
+procedure ListAll(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOParcelas: TParcelaDAO;
+begin
+  try
+    LDAOParcelas := TParcelaDAO.Create;
+    Res.Send<TJSONArray>(LDAOParcelas.ListAll);
+  finally
+    LDAOParcelas.Free;
+  end;
+end;
+
+procedure Insert(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOParcelas: TParcelaDAO;
+  oJson: TJSONObject;
+  ParcelaModel: TParcelaModel;
+begin
+  try
+    if Req.Body.IsEmpty then
+      raise Exception.Create('Dados da Parcela não encontrado.');
+    LDAOParcelas := TParcelaDAO.Create;
+    ParcelaModel := TParcelaModel.Create;
+    oJson := Req.Body<TJSONObject>;
+    ParcelaModel.id_parcelas          := 0;
+    ParcelaModel.id_tipo_pgto         := oJson.GetValue<integer>('id_tipo_pgto');
+    ParcelaModel.id_credor            := oJson.GetValue<integer>('id_credor');
+    ParcelaModel.id_cliente           := oJson.GetValue<integer>('id_cliente');
+    ParcelaModel.valor_total          := oJson.GetValue<Double>('valor_total');
+    ParcelaModel.dt_primeira_parcela  := oJson.GetValue<string>('dt_primeira_parcela');
+    ParcelaModel.vl_primeira_parcela  := oJson.GetValue<Double>('vl_primeira_parcela');
+    ParcelaModel.dt_segunda_parcela   := oJson.GetValue<string>('dt_segunda_parcela');
+    ParcelaModel.vl_segunda_parcela   := oJson.GetValue<Double>('vl_segunda_parcela');
+    ParcelaModel.dt_terceira_parcela  := oJson.GetValue<string>('dt_terceira_parcela');
+    ParcelaModel.vl_terceira_parcela  := oJson.GetValue<Double>('vl_terceira_parcela');
+    ParcelaModel.dt_quarta_parcela    := oJson.GetValue<string>('dt_quarta_parcela');
+    ParcelaModel.vl_quarta_parcela    := oJson.GetValue<Double>('vl_quarta_parcela');
+    ParcelaModel.status               := oJson.GetValue<integer>('status');
+    LDAOParcelas.Insert(ParcelaModel);
+    Res.Send<TJSONObject>(oJson).Status(THTTPStatus.Created);
+  finally
+    LDAOParcelas.Free;
+    ParcelaModel.Free;
+  end;
+end;
+
+procedure Update(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOParcelas: TParcelaDAO;
+  oJson: TJSONObject;
+  ParcelaModel: TParcelaModel;
+begin
+  try
+    if Req.Body.IsEmpty then
+      raise Exception.Create('Dados da Parcela não encontrado.');
+    LDAOParcelas := TParcelaDAO.Create;
+    ParcelaModel := TParcelaModel.Create;
+    oJson := Req.Body<TJSONObject>;
+    ParcelaModel.id_parcelas          := oJson.GetValue<integer>('id_parcelas');
+    ParcelaModel.id_tipo_pgto         := oJson.GetValue<integer>('id_tipo_pgto');
+    ParcelaModel.id_credor            := oJson.GetValue<integer>('id_credor');
+    ParcelaModel.id_cliente           := oJson.GetValue<integer>('id_cliente');
+    ParcelaModel.valor_total          := StrToFloat(StringReplace(oJson.GetValue<string>('valor_total'), ',', '.', [rfReplaceAll, rfIgnoreCase]));
+    ParcelaModel.dt_primeira_parcela  := oJson.GetValue<string>('dt_primeira_parcela');
+    ParcelaModel.vl_primeira_parcela  := oJson.GetValue<Double>('vl_primeira_parcela');
+    ParcelaModel.dt_segunda_parcela   := oJson.GetValue<string>('dt_segunda_parcela');
+    ParcelaModel.vl_segunda_parcela   := oJson.GetValue<Double>('vl_segunda_parcela');
+    ParcelaModel.dt_terceira_parcela  := oJson.GetValue<string>('dt_terceira_parcela');
+    ParcelaModel.vl_terceira_parcela  := oJson.GetValue<Double>('vl_terceira_parcela');
+    ParcelaModel.dt_quarta_parcela    := oJson.GetValue<string>('dt_quarta_parcela');
+    ParcelaModel.vl_quarta_parcela    := oJson.GetValue<Double>('vl_quarta_parcela');
+    ParcelaModel.status               := oJson.GetValue<integer>('status');
+    LDAOParcelas.Update(ParcelaModel);
+    Res.Send<TJSONObject>(oJson).Status(THTTPStatus.Created);
+  finally
+    LDAOParcelas.Free;
+    ParcelaModel.Free;
+  end;
+end;
+
+procedure Delete(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LDAOParcelas: TParcelaDAO;
+  iId: Integer;
+begin
+  if Req.Params.Count = 0 then
+    raise Exception.Create('id não encontrado.');
+  try
+    LDAOParcelas := TParcelaDAO.Create;
+    iId := StrToInt(Req.Params.Items['id']);
+    LDAOParcelas.Delete(iId);
+    Res.Send<TJSONObject>(TJSONObject.Create.AddPair('message', 'Parcela deletado com sucesso.'));
+  finally
+    LDAOParcelas.Free;
+  end;
+end;
+
+procedure Registry;
+begin
+  THorse.Get('/parcelassbyidcliente/:id' , ListByIdCliente);
+  THorse.Get('/parcelasall'             , ListAll);
+  THorse.Post('/parcelainsert'           , Insert);
+  THorse.Put('/parcelaupdate'            , Update);
+  THorse.Delete('/parceladelete/:id'     , Delete);
+end;
+
+
+end.
